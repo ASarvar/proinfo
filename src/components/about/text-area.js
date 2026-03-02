@@ -33,7 +33,7 @@ const TextArea = () => {
               <p>
                 We partner with leading global manufacturers to bring world-class library equipment and software 
                 to Uzbekistan. Our team of certified specialists provides full-cycle support from consultation 
-                and system design to installation, training, and ongoing technical support. Whether you're 
+                and system design to installation, training, and ongoing technical support. Whether you&apos;re 
                 modernizing a university library or building a new public information center, ProInfo.uz 
                 delivers reliable, scalable solutions tailored to your specific needs.
               </p>
