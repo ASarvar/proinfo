@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade } from "swiper";
+import { EffectFade } from "swiper/modules";
 // internal
 import slider_img_1 from "@assets/img/slider/13/slider-1.png";
 import slider_img_2 from "@assets/img/slider/13/slider-2.png";
