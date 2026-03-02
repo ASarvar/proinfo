@@ -12,7 +12,7 @@ const menu_data = [
   {
     id: 3,
     title: 'Products',
-    link: '/shop'
+    link: '/products'
   },
   {
     id: 4,

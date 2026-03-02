@@ -13,12 +13,12 @@ const ShopBanner = () => {
               <div className="banner__content">
                 <span>Apple iPhone 12 Pro</span>
                 <h3 className="banner__title">
-                  <Link href="/shop">The wait is on: iphone 12 max pro</Link>
+                  <Link href="/products">The wait is on: iphone 12 max pro</Link>
                 </h3>
                 <p>Last call for up to <span>32%</span> off! </p>
 
                 <div className="banner__btn">
-                  <Link href="/shop" className="tp-btn">
+                  <Link href="/products" className="tp-btn">
                     Buy Now
                     <RightArrow/>
                   </Link>

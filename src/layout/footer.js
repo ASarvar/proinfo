@@ -66,7 +66,7 @@ const Footer = () => {
                   contents={[
                     { url: "/", title: "Home" },
                     { url: "/about", title: "About Us" },
-                    { url: "/shop", title: "Products" },
+                    { url: "/products", title: "Products" },
                     { url: "/policy", title: "Privacy Policy" },
                     { url: "/terms", title: "Terms & Conditions" },
                   ]}

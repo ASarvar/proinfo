@@ -84,7 +84,7 @@ const HeroBanner = () => {
                       <h3 className="slider__title-13">{item.title}</h3>
 
                       <div className="slider__btn-13 ">
-                        <Link href="/shop" className="tp-btn-border">
+                        <Link href="/products" className="tp-btn-border">
                           Learn More
                           <span>
                             <RightArrow />
