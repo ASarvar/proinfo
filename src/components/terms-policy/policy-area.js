@@ -1,4 +1,3 @@
-
 const PolicyArea = () => {
   return (
     <section className="policy__area pb-120">
@@ -7,76 +6,79 @@ const PolicyArea = () => {
           <div className="col-xl-10">
             <div className="policy__wrapper policy__translate p-relative z-index-1">
               <div className="policy__item mb-35">
-                <h4 className="policy__meta">Effective date: May 25, 2023</h4>
+                <h4 className="policy__meta">Effective date: February 24, 2026</h4>
                 <p>
-                  Harry knows that you care about how your personal information
-                  is used and shared, and Harry takes your privacy seriously.
-                  Please read the following to learn more about Harry Privacy
-                  Policy (“Privacy Policy”). This Privacy Policy also tells you
-                  about your rights and choices with respect to your Personal
-                  Information, and how you can reach us to update your contact
-                  information or get answers to questions you may have about our
-                  privacy practices.
+                  ProInfo.uz understands that you care about how your personal and business information
+                  is used and shared, and we take your privacy seriously.
+                  Please read the following to learn more about our Privacy
+                  Policy. This Privacy Policy explains how we collect, use, and protect
+                  information when you visit our website or engage with our library automation services.
                 </p>
                 <p>
-                  By using or accessing the Services in any manner, you
+                  By using or accessing our website and services, you
                   acknowledge that you accept the practices and policies
-                  outlined in this Privacy Policy, and you hereby consent that
-                  Harry will collect, use, and share your information in the
-                  following ways. Remember that your use of Services is at all
-                  times subject to the Terms as set forth at
-                  https://harry.com/legal/terms, which incorporate this Privacy
-                  Policy. Any terms Harry uses in this Privacy Policy without
-                  defining them have the definitions given to them in the Terms.
+                  outlined in this Privacy Policy. We collect only necessary information
+                  to provide our B2B library automation solutions, including RFID systems,
+                  barcode scanners, self-service kiosks, and library management software.
+                  Your data is used solely for service delivery, support, and business communication.
                 </p>
               </div>
 
               <div className="policy__item policy__item-2 mb-35">
                 <h3 className="policy__title">Information Collection</h3>
                 <p>
-                  You can visit and enjoy our Website without disclosing any
-                  Personal Information about yourself. However, for the Service
-                  to work properly we will need you to share with us certain
-                  Personal Information.
+                  You can visit our website and browse products without disclosing any
+                  personal information. However, when you request a quote, schedule a consultation,
+                  or engage our services, we may collect business contact information including
+                  organization name, contact person, email address, phone number, and project requirements.
                 </p>
 
                 <p>
-                  For the purposes of this Privacy Policy, “Personal
-                  Information” means information that identifies, relates to,
-                  describes, is reasonably capable of being associated with, or
-                  could be reasonably linked, directly or indirectly, with a
-                  particular consumer, device or household. It does not include
-                  de-identified or aggregate information, or public information
-                  lawfully available from governmental records.
+                  For B2B services, we collect institutional information necessary to
+                  design and implement library automation solutions. This may include library
+                  specifications, technical requirements, and organizational details needed
+                  to provide appropriate equipment and software recommendations. All information
+                  is stored securely and used only for service delivery and support purposes.
                 </p>
               </div>
 
               <div className="policy__list mb-35">
-                <h3 className="policy__title">Use of Personal Information</h3>
+                <h3 className="policy__title">Use of Information</h3>
                 <ul>
-                  <li>To provide and maintain the Service;</li>
-                  <li>To detect, prevent and address technical issues;</li>
+                  <li>To respond to your inquiries and provide product information;</li>
+                  <li>To prepare customized proposals and quotations for library automation projects;</li>
                   <li>
-                    To register you as a user and to provide the services you
-                    require;
+                    To deliver, install, and configure library equipment and software systems;
                   </li>
                   <li>
-                    To decide whether to offer you a Capchase product or
-                    service;
+                    To provide technical support, maintenance, and training services;
                   </li>
-                  <li>To notify you about changes to our Service;</li>
-                  <li>To provide customer care and support;</li>
+                  <li>To notify you about product updates, new solutions, and service improvements;</li>
+                  <li>To process orders and manage business relationships with institutional clients;</li>
+                  <li>To comply with legal obligations and maintain business records;</li>
                 </ul>
               </div>
               <div className="policy__contact">
                 <h3 className="policy__title policy__title-2">Contact us</h3>
-                <p>You may contact us at any time via:</p>
+                <p>For any privacy-related questions or concerns, please contact us:</p>
 
                 <ul>
                   <li>
                     Email:{" "}
                     <span>
-                      <a href="mailto:harry.com">support@harry.com</a>
+                      <a href="mailto:salom@proinfo.uz">salom@proinfo.uz</a>
+                    </span>
+                  </li>
+                  <li>
+                    Phone:{" "}
+                    <span>
+                      <a href="tel:+998770796600">+998-77-079-66-00</a>
+                    </span>
+                  </li>
+                  <li>
+                    Phone:{" "}
+                    <span>
+                      <a href="tel:+998777083331">+998-77-708-33-31</a>
                     </span>
                   </li>
                 </ul>
@@ -85,10 +87,10 @@ const PolicyArea = () => {
                   <p>
                     <a
                       rel="noreferrer"
-                      href="https://www.google.com/maps/place/102+Thompson+St,+New+York,+NY+10012,+USA/@40.7255437,-74.004061,17z/data=!3m1!4b1!4m5!3m4!1s0x89c2598c338f691d:0x6d5f394e7a1962cc!8m2!3d40.7255397!4d-74.0018723"
+                      href="https://www.google.com/maps/search/?api=1&query=Tashkent,Uzbekistan"
                       target="_blank"
                     >
-                      harry PTY LTD <br /> 4270, Brisbane, Australia
+                      ProInfo.uz <br /> Tashkent, Uzbekistan
                     </a>
                   </p>
                 </div>

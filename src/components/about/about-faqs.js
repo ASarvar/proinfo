@@ -10,21 +10,21 @@ import useModal from "@hooks/use-modal";
 const faq_items = [
   {
     id: "about-one",
-    title: "Can I cancel my account at any time?",
+    title: "What types of libraries do you work with?",
     show: true,
-    desc: "Non similique culpa in provident quos sit commodi beatae ea laborum suscipit id autem velit aut iusto odio et deleniti quis et doloremque enim vel consequuntur quos.",
+    desc: "We serve all types of libraries including university libraries, public libraries, school libraries, and specialized research centers. Our solutions are scalable and customizable to meet the unique requirements of institutions of any size, from small school libraries to large multi-branch public library systems.",
     parent: "faqaccordion",
   },
   {
     id: "about-two",
-    title: "What happens after the license expires?",
-    desc: "Non similique culpa in provident quos sit commodi beatae ea laborum suscipit id autem velit aut iusto odio et deleniti quis et doloremque enim vel consequuntur quos.",
+    title: "Do you provide training for library staff?",
+    desc: "Yes, comprehensive training is a core part of our service. We provide on-site training for all library staff on system operation, RFID technology, self-service equipment, and management software. Training materials are available in Russian and Uzbek, and we offer ongoing support to ensure your team is confident using the new systems.",
     parent: "faqaccordion",
   },
   {
     id: "about-three",
-    title: "Does Harry have any documentations?",
-    desc: "Non similique culpa in provident quos sit commodi beatae ea laborum suscipit id autem velit aut iusto odio et deleniti quis et doloremque enim vel consequuntur quos.",
+    title: "What is your warranty and support policy?",
+    desc: "All equipment comes with manufacturer warranties ranging from 1-3 years depending on the product. We provide local technical support, maintenance services, and software updates throughout the warranty period and beyond. Our support team is available via phone, email, and on-site visits to ensure your library automation system runs smoothly.",
     parent: "faqaccordion",
   },
 ];
@@ -54,10 +54,10 @@ const AboutFaqs = () => {
               <div className="faq__wrapper-2 faq__gradient-border faq__style-2 tp-accordion pl-160">
                 <div className="faq__title-wrapper">
                   <span className="faq__title-pre">
-                   Get in touch with us to see how
+                   Learn more about our services
                   </span>
                   <h3 className="faq__title">
-                    Provide smart and flexible digital services
+                    Modern Library Solutions for Your Institution
                   </h3>
                 </div>
                 <div className="accordion" id="faqaccordion">

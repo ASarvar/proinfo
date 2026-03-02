@@ -36,10 +36,13 @@ const BoxItems = () => {
             content={
               <>
                 <p>
-                  <a href="mailto:location@website.com">location@website.com</a>
+                  <a href="mailto:salom@proinfo.uz">salom@proinfo.uz</a>
                 </p>
                 <p>
-                  <a href="tel:602-762-472-96">+(602) 762 472 96</a>
+                  <a href="tel:+998770796600">+998-77-079-66-00</a>
+                </p>
+                <p>
+                  <a href="tel:+998777083331">+998-77-708-33-31</a>
                 </p>
               </>
             }
@@ -52,10 +55,10 @@ const BoxItems = () => {
                 <p>
                   <a
                     rel="noreferrer"
-                    href="https://www.google.com/maps/place/102+Thompson+St,+New+York,+NY+10012,+USA/@40.7255437,-74.004061,17z/data=!3m1!4b1!4m5!3m4!1s0x89c2598c338f691d:0x6d5f394e7a1962cc!8m2!3d40.7255397!4d-74.0018723"
+                    href="https://www.google.com/maps/search/?api=1&query=Tashkent,Uzbekistan"
                     target="_blank"
                   >
-                    88 New South Head Rd, Triple, New York
+                    Tashkent, Uzbekistan
                   </a>
                 </p>
               </>

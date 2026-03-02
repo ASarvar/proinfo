@@ -5,7 +5,7 @@ import SectionTop from "@components/terms-policy/section-top-bar";
 import PolicyArea from "@components/terms-policy/policy-area";
 
 export const metadata = {
-  title: "Policy - Harri Shop",
+  title: "Privacy Policy - ProInfo.uz",
 };
 
 export default function Policy() {
@@ -16,10 +16,7 @@ export default function Policy() {
         title="Privacy Policy"
         subtitle={
           <>
-            Your privacy is important to us. It is Harry’s policy to respect
-            your privacy regarding <br /> any information we may collect from
-            you across our website, https:// Harry.com, <br /> and other sites
-            we own and operate.
+            Your privacy is important to us. ProInfo.uz is committed to protecting <br /> your personal information and respecting your privacy when you visit our website <br /> or use our library automation services.
           </>
         }
       />

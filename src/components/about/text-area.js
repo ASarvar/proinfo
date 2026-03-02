@@ -12,7 +12,7 @@ const TextArea = () => {
               data-wow-duration="1s"
             >
               <h3 className="about__text-title">
-                It started with a <br /> bang now we are here.
+                Leading Library <br /> Automation in Uzbekistan
               </h3>
             </div>
           </div>
@@ -23,18 +23,19 @@ const TextArea = () => {
               data-wow-duration="1s"
             >
               <p>
-                Ut at maximus magna. Vestibulum interdum sapien in facilisis
-                imperdiet. Pellentesque habitant morbi tristique senectus et
-                netus et malesuada fames ac turpis egestas. Proin ac placerat
-                risus. Nullam eget tortor felis. Nulla facilisi.Vestibulum
-                mattis diam non luctus elementum. Cras sollicitudin, nisi in
-                semper viverra, felis diam consequat mi, quis tincidunt ligula
+                ProInfo.uz specializes in providing cutting-edge library automation solutions across Uzbekistan. 
+                With years of experience in the information technology sector, we deliver comprehensive systems 
+                that transform traditional libraries into modern, efficient information centers. Our solutions 
+                integrate RFID technology, advanced barcode systems, self-service kiosks, and intelligent 
+                management software designed specifically for educational institutions and public libraries.
               </p>
 
               <p>
-                Nam nibh diam, varius quis lectus eget, laoreet cursus metus.
-                morbi augue lectus, dapibus eget justo nec, consectetur auctor
-                nis luctus neque.!
+                We partner with leading global manufacturers to bring world-class library equipment and software 
+                to Uzbekistan. Our team of certified specialists provides full-cycle support from consultation 
+                and system design to installation, training, and ongoing technical support. Whether you're 
+                modernizing a university library or building a new public information center, ProInfo.uz 
+                delivers reliable, scalable solutions tailored to your specific needs.
               </p>
             </div>
           </div>

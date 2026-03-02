@@ -3,7 +3,7 @@ import ShopDetailsMainArea from "@components/product-details/product-details-are
 
 
 export const metadata = {
-  title: "Product Details - Harri Shop",
+  title: "Product Details - ProInfo",
 };
 
 const ProductDetailsPage = async ({ params }) => {
