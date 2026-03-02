@@ -1,0 +1,277 @@
+// ProInfo Equipment Mock Data
+const products = [
+  // Featured/Top Rated Products
+  {
+    id: 1,
+    _id: "proinfo-scanner-001",
+    title: "Professional Book Scanner BS-3200",
+    image: "/assets/img/product/product-1.jpg",
+    price: 12500,
+    originalPrice: 15000,
+    discount: 17,
+    category: "Professional Scanners",
+    topRated: true,
+    description: "High-resolution scanner for books and documents with automatic page detection",
+    specifications: {
+      resolution: "600 DPI",
+      scanSpeed: "3 seconds per page",
+      scanArea: "A3",
+    }
+  },
+  {
+    id: 2,
+    _id: "proinfo-rfid-001",
+    title: "RFID Library Gate System RG-400",
+    image: "/assets/img/product/product-2.jpg",
+    price: 8500,
+    originalPrice: 10000,
+    discount: 15,
+    category: "RFID Technology",
+    topRated: true,
+    description: "Advanced RFID security gate system for library entrance/exit control",
+    specifications: {
+      channels: "Dual channel",
+      range: "1.5 meters",
+      detection: "99.9% accuracy",
+    }
+  },
+  {
+    id: 3,
+    _id: "proinfo-terminal-001",
+    title: "Self-Service Terminal UniBook MINI PRO",
+    image: "/assets/img/product/product-3.jpg",
+    price: 6500,
+    originalPrice: 7500,
+    discount: 13,
+    category: "Additional Equipment",
+    topRated: true,
+    description: "Compact self-service terminal for library patron self-checkout",
+    specifications: {
+      screen: "15.6 inch touchscreen",
+      rfid: "Integrated RFID reader",
+      compact: "Space-saving design",
+    }
+  },
+  {
+    id: 4,
+    _id: "proinfo-scanner-002",
+    title: "Archive Scanner AS-5000 Pro",
+    image: "/assets/img/product/product-4.jpg",
+    price: 18000,
+    originalPrice: 22000,
+    discount: 18,
+    category: "Professional Scanners",
+    topRated: true,
+    description: "Professional archive scanner for fragile and large-format documents",
+    specifications: {
+      resolution: "1200 DPI",
+      format: "A0 format support",
+      preservation: "Non-contact scanning",
+    }
+  },
+  // Best Selling Scanners
+  {
+    id: 5,
+    _id: "proinfo-scanner-003",
+    title: "Flatbed Scanner FS-2400",
+    image: "/assets/img/product/product-5.jpg",
+    price: 3500,
+    originalPrice: 4000,
+    discount: 13,
+    category: "Professional Scanners",
+    bestSelling: true,
+    description: "High-quality flatbed scanner for documents and photos",
+    specifications: {
+      resolution: "4800 DPI",
+      scanArea: "A4",
+      speed: "Fast scanning",
+    }
+  },
+  {
+    id: 6,
+    _id: "proinfo-scanner-004",
+    title: "Overhead Book Scanner OBS-1000",
+    image: "/assets/img/product/product-6.jpg",
+    price: 9500,
+    originalPrice: 11000,
+    discount: 14,
+    category: "Professional Scanners",
+    bestSelling: true,
+    description: "Overhead scanner with automatic book cradle for bound materials",
+    specifications: {
+      resolution: "800 DPI",
+      autofocus: "Automatic focusing",
+      ledLight: "LED illumination",
+    }
+  },
+  {
+    id: 7,
+    _id: "proinfo-scanner-005",
+    title: "Microfilm Scanner MS-600",
+    image: "/assets/img/product/product-7.jpg",
+    price: 15000,
+    originalPrice: 18000,
+    discount: 17,
+    category: "Professional Scanners",
+    bestSelling: true,
+    description: "Digital microfilm scanner for archive digitization",
+    specifications: {
+      resolution: "Ultra-high resolution",
+      formats: "Multiple film formats",
+      software: "Included software",
+    }
+  },
+  {
+    id: 8,
+    _id: "proinfo-scanner-006",
+    title: "Portable Scanner PS-300",
+    image: "/assets/img/product/product-8.jpg",
+    price: 2500,
+    originalPrice: 3000,
+    discount: 17,
+    category: "Professional Scanners",
+    bestSelling: true,
+    description: "Portable document scanner for mobile scanning needs",
+    specifications: {
+      resolution: "600 DPI",
+      portable: "Battery powered",
+      connectivity: "WiFi & USB",
+    }
+  },
+  // Latest RFID Products
+  {
+    id: 9,
+    _id: "proinfo-rfid-002",
+    title: "RFID Desktop Reader RD-200",
+    image: "/assets/img/product/product-9.jpg",
+    price: 1500,
+    originalPrice: 1800,
+    discount: 17,
+    category: "RFID Technology",
+    latestProduct: true,
+    description: "Compact RFID reader for library circulation desks",
+    specifications: {
+      frequency: "13.56 MHz",
+      readRange: "15 cm",
+      interface: "USB",
+    }
+  },
+  {
+    id: 10,
+    _id: "proinfo-rfid-003",
+    title: "RFID Tag Programmer TP-100",
+    image: "/assets/img/product/product-10.jpg",
+    price: 2800,
+    originalPrice: 3200,
+    discount: 13,
+    category: "RFID Technology",
+    latestProduct: true,
+    description: "Professional RFID tag encoding and programming station",
+    specifications: {
+      encoding: "Batch encoding",
+      speed: "Fast programming",
+      compatible: "ISO standards",
+    }
+  },
+  {
+    id: 11,
+    _id: "proinfo-rfid-004",
+    title: "RFID Stock Management System SMS-500",
+    image: "/assets/img/product/product-11.jpg",
+    price: 12000,
+    originalPrice: 14000,
+    discount: 14,
+    category: "RFID Technology",
+    latestProduct: true,
+    description: "Complete RFID-based inventory management system",
+    specifications: {
+      capacity: "Unlimited items",
+      realtime: "Real-time tracking",
+      reports: "Advanced analytics",
+    }
+  },
+  {
+    id: 12,
+    _id: "proinfo-rfid-005",
+    title: "Mobile RFID Reader MR-150",
+    image: "/assets/img/product/product-12.jpg",
+    price: 3500,
+    originalPrice: 4200,
+    discount: 17,
+    category: "RFID Technology",
+    latestProduct: true,
+    description: "Handheld RFID reader for mobile inventory checking",
+    specifications: {
+      readRange: "Up to 3 meters",
+      battery: "Long battery life",
+      bluetooth: "Bluetooth connectivity",
+    }
+  },
+  // Additional Equipment (not in tabs - background data)
+  {
+    id: 13,
+    _id: "proinfo-kiosk-001",
+    title: "Information Kiosk IK-2000",
+    image: "/assets/img/product/product-1.jpg",
+    price: 5500,
+    originalPrice: 6500,
+    discount: 15,
+    category: "Additional Equipment",
+    description: "Interactive information kiosk with touchscreen",
+    specifications: {
+      screen: "32 inch display",
+      interactive: "Multi-touch",
+      software: "Custom software",
+    }
+  },
+  {
+    id: 14,
+    _id: "proinfo-computer-001",
+    title: "Library Computer Station LCS-100",
+    image: "/assets/img/product/product-2.jpg",
+    price: 1800,
+    originalPrice: 2200,
+    discount: 18,
+    category: "Additional Equipment",
+    description: "Complete computer workstation for library patrons",
+    specifications: {
+      processor: "Intel i5",
+      ram: "8GB RAM",
+      storage: "256GB SSD",
+    }
+  },
+  {
+    id: 15,
+    _id: "proinfo-printer-001",
+    title: "Library Printer LP-400",
+    image: "/assets/img/product/product-3.jpg",
+    price: 800,
+    originalPrice: 1000,
+    discount: 20,
+    category: "Additional Equipment",
+    description: "Reliable printer for library patron printing services",
+    specifications: {
+      speed: "40 pages/min",
+      duplex: "Automatic duplex",
+      network: "Network ready",
+    }
+  },
+  {
+    id: 16,
+    _id: "proinfo-ai-001",
+    title: "AI Library Assistant Robot AIR-300",
+    image: "/assets/img/product/product-4.jpg",
+    price: 25000,
+    originalPrice: 30000,
+    discount: 17,
+    category: "AI Technology",
+    description: "Interactive AI-powered robot assistant for libraries",
+    specifications: {
+      ai: "Advanced AI",
+      voice: "Voice recognition",
+      navigation: "Autonomous navigation",
+    }
+  },
+];
+
+export default products;
