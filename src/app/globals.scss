@@ -1,5 +1,8 @@
 @import '~bootstrap/scss/bootstrap';
-@import "swiper/swiper-bundle.css";
+@import "swiper/css";
+@import "swiper/css/effect-fade";
+@import "swiper/css/scrollbar";
+@import "swiper/css/pagination";
 @import "~slick-carousel/slick/slick.css"; 
 @import 'node_modules/react-modal-video/scss/modal-video.scss';
 @import 'node_modules/react-tooltip/dist/react-tooltip.css';
