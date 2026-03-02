@@ -1,4 +1,8 @@
 import MainProvider from "@components/provider/main-provider";
+import "swiper/css";
+import "swiper/css/effect-fade";
+import "swiper/css/scrollbar";
+import "swiper/css/pagination";
 import "./globals.scss";
 import {
   Poppins,
