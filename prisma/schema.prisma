@@ -1,0 +1,318 @@
+// ProInfo.uz Database Schema
+// PostgreSQL + Prisma ORM
+// Multilingual support for RU, UZ, EN
+
+// ============================================================================
+// SCHEMA CONFIGURATION
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum Language {
+  RU
+  UZ
+  EN
+}
+
+enum MediaType {
+  POST
+  VIDEO
+  PHOTO
+  DOWNLOAD
+}
+
+enum DownloadFileType {
+  PDF
+  DOC
+  XLS
+  ZIP
+  OTHER
+}
+
+// ============================================================================
+// CONTENT ENTITIES
+// ============================================================================
+
+// Category for products (RFID, Automation, Software, etc.)
+model Category {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  imageUrl      String?
+  order        Int      @default(0)
+  
+  // Relations
+  products      Product[]
+  translations  Translation[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([slug])
+}
+
+// Product/Service in catalog
+model Product {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  categoryId    String
+  imageUrl      String?
+  price         Float?
+  order        Int      @default(0)
+  
+  // Relations
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  translations  Translation[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([categoryId, slug])
+}
+
+// Direction/Service category
+model Direction {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  imageUrl      String?
+  order        Int      @default(0)
+  
+  // Relations
+  translations  Translation[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([slug])
+}
+
+// Blog Post
+model Post {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  coverImageUrl String?
+  publishedAt   DateTime?
+  order        Int      @default(0)
+  
+  // Relations
+  translations  Translation[]
+  tags          PostTag[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([slug, publishedAt])
+}
+
+// Video media item
+model Video {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  coverImageUrl String?
+  videoUrl      String
+  duration      Int?      // in seconds
+  publishedAt   DateTime?
+  order        Int      @default(0)
+  
+  // Relations
+  translations  Translation[]
+  tags          VideoTag[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([slug, publishedAt])
+}
+
+// Photo Album
+model PhotoAlbum {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  coverImageUrl String?
+  publishedAt   DateTime?
+  order        Int      @default(0)
+  
+  // Relations
+  items         PhotoItem[]
+  translations  Translation[]
+  tags          PhotoTag[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([slug, publishedAt])
+}
+
+// Photo Item in album
+model PhotoItem {
+  id            String   @id @default(cuid())
+  albumId       String
+  imageUrl      String
+  caption       String?
+  order        Int      @default(0)
+  
+  // Relations
+  album         PhotoAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([albumId])
+}
+
+// Downloadable file/resource
+model DownloadFile {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  fileUrl       String
+  fileType      DownloadFileType @default(OTHER)
+  fileSizeKb    Int?
+  publishedAt   DateTime?
+  order        Int      @default(0)
+  
+  // Relations
+  translations  Translation[]
+  tags          DownloadTag[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([slug, publishedAt])
+}
+
+// FAQ - frequently asked questions
+model Faq {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  order        Int      @default(0)
+  
+  // Relations
+  translations  Translation[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([slug])
+}
+
+// ============================================================================
+// MULTILINGUAL SUPPORT
+// ============================================================================
+
+// Generic translation table for all entities
+model Translation {
+  id            String   @id @default(cuid())
+  language      Language @default(RU)
+  
+  // Polymorphic foreign keys - store entity type and ID
+  entityType    String   // "Category", "Product", "Direction", "Post", "Video", "PhotoAlbum", "DownloadFile", "FAQ"
+  entityId      String
+  
+  // Translated fields (common to most entities)
+  title         String
+  description   String?
+  content       String?
+  
+  // For Post specifically
+  excerpt       String?
+  
+  // Relations to actual entities (optional, used where directly related)
+  category      Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId    String?
+  
+  product       Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId     String?
+  
+  direction     Direction? @relation(fields: [directionId], references: [id], onDelete: Cascade)
+  directionId   String?
+  
+  post          Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId        String?
+  
+  video         Video? @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId       String?
+  
+  photoAlbum    PhotoAlbum? @relation(fields: [photoAlbumId], references: [id], onDelete: Cascade)
+  photoAlbumId  String?
+  
+  downloadFile  DownloadFile? @relation(fields: [downloadFileId], references: [id], onDelete: Cascade)
+  downloadFileId String?
+  
+  faq           Faq? @relation(fields: [faqId], references: [id], onDelete: Cascade)
+  faqId         String?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Ensure only one translation per entity per language
+  @@unique([language, categoryId])
+  @@unique([language, productId])
+  @@unique([language, directionId])
+  @@unique([language, postId])
+  @@unique([language, videoId])
+  @@unique([language, photoAlbumId])
+  @@unique([language, downloadFileId])
+  @@unique([language, faqId])
+  @@index([entityType, entityId, language])
+}
+
+// ============================================================================
+// TAGS / TAXONOMY
+// ============================================================================
+
+model PostTag {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  
+  posts         Post[]
+  
+  createdAt     DateTime @default(now())
+
+  @@index([slug])
+}
+
+model VideoTag {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  
+  videos        Video[]
+  
+  createdAt     DateTime @default(now())
+
+  @@index([slug])
+}
+
+model PhotoTag {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  
+  albums        PhotoAlbum[]
+  
+  createdAt     DateTime @default(now())
+
+  @@index([slug])
+}
+
+model DownloadTag {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  
+  files         DownloadFile[]
+  
+  createdAt     DateTime @default(now())
+
+  @@index([slug])
+}
