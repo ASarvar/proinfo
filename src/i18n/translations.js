@@ -44,9 +44,25 @@ export const translations = {
       email: "salom@proinfo.uz",
     },
     hero: {
-      slide1: { preTitle: "Comprehensive Solutions For Libraries", title: "Transform Your Knowledge Center" },
-      slide2: { preTitle: "Innovation Meets Expertise", title: "RFID & Automation Solutions" },
-      slide3: { preTitle: "Professional Digitization", title: "Advanced Scanning Technology" },
+      slide1: {
+        preTitle: "Library Automation Platform",
+        title: "Build A Faster Reader Experience",
+        description: "RFID workflows, self-service kiosks, and software integration for modern library operations.",
+      },
+      slide2: {
+        preTitle: "From Plan To Deployment",
+        title: "Launch Scalable Branch Operations",
+        description: "We design, deploy, and support automation programs tailored to universities and public libraries.",
+      },
+      slide3: {
+        preTitle: "Technology + Service",
+        title: "Reliable Results Across Every Library",
+        description: "Global equipment partners, local implementation expertise, and long-term technical support.",
+      },
+      actions: {
+        solutions: "Our Solutions",
+        contact: "Contact",
+      },
     },
     solutions: {
       title: "Our Solutions",
@@ -116,9 +132,25 @@ export const translations = {
       email: "salom@proinfo.uz",
     },
     hero: {
-      slide1: { preTitle: "Комплексные решения для библиотек", title: "Трансформируйте ваш центр знаний" },
-      slide2: { preTitle: "Инновация встречает опыт", title: "RFID и решения автоматизации" },
-      slide3: { preTitle: "Профессиональная оцифровка", title: "Передовая технология сканирования" },
+      slide1: {
+        preTitle: "Платформа автоматизации библиотек",
+        title: "Сделайте обслуживание читателей быстрее",
+        description: "RFID-процессы, киоски самообслуживания и программная интеграция для современных библиотек.",
+      },
+      slide2: {
+        preTitle: "От плана до внедрения",
+        title: "Запускайте масштабируемые процессы в филиалах",
+        description: "Мы проектируем, внедряем и поддерживаем автоматизацию для университетских и публичных библиотек.",
+      },
+      slide3: {
+        preTitle: "Технологии и сервис",
+        title: "Надежный результат для каждой библиотеки",
+        description: "Глобальные партнеры по оборудованию, локальная экспертиза внедрения и долгосрочная техподдержка.",
+      },
+      actions: {
+        solutions: "Наши решения",
+        contact: "Контакты",
+      },
     },
     solutions: {
       title: "Наши решения",
@@ -188,9 +220,25 @@ export const translations = {
       email: "salom@proinfo.uz",
     },
     hero: {
-      slide1: { preTitle: "Kutubxonalar uchun kompleks yechimlar", title: "Bilim markasingizni o'zgartiring" },
-      slide2: { preTitle: "Innovatsiya va tajribaning uchrashishi", title: "RFID va avtomatlashtirish yechimlari" },
-      slide3: { preTitle: "Professional raqamlashtiirish", title: "Ilg'or skanerlash texnologiyasi" },
+      slide1: {
+        preTitle: "Kutubxona avtomatlashtirish platformasi",
+        title: "Kitobxonlar xizmatini tezroq qiling",
+        description: "Zamonaviy kutubxona jarayonlari uchun RFID ish oqimi, self-service kiosklar va dasturiy integratsiya.",
+      },
+      slide2: {
+        preTitle: "Rejadan joriy etishgacha",
+        title: "Filiallar jarayonini masshtablash",
+        description: "Universitet va ommaviy kutubxonalar uchun avtomatlashtirishni loyihalaymiz, joriy qilamiz va qo'llab-quvvatlaymiz.",
+      },
+      slide3: {
+        preTitle: "Texnologiya va servis",
+        title: "Har bir kutubxona uchun ishonchli natija",
+        description: "Global ishlab chiqaruvchilar, mahalliy joriy etish tajribasi va uzoq muddatli texnik yordam.",
+      },
+      actions: {
+        solutions: "Bizning yechimlar",
+        contact: "Kontakt",
+      },
     },
     solutions: {
       title: "Bizning yechimlar",

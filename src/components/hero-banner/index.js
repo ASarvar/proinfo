@@ -1,116 +1,68 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade } from "swiper/modules";
+import { Autoplay, EffectFade } from "swiper/modules";
 // internal
-import slider_img_1 from "@assets/img/slider/13/slider-1.png";
-import slider_img_2 from "@assets/img/slider/13/slider-2.png";
-import slider_img_3 from "@assets/img/slider/13/slider-3.png";
 import { RightArrow } from "@svg/index";
+import { useI18n } from "@i18n/i18n-context";
 
-const slider_data = [
-  {
-    id: 1,
-    pre_title: (
-      <>
-        Comprehensive Solutions <br /> For Libraries
-      </>
-    ),
-    title: (
-      <>
-        Transform Your <br /> Knowledge Center
-      </>
-    ),
-    img: slider_img_1,
-  },
-  {
-    id: 2,
-    pre_title: (
-      <>
-        Innovation <br /> Meets Expertise
-      </>
-    ),
-    title: (
-      <>
-        RFID & Automation <br /> Solutions
-      </>
-    ),
-    img: slider_img_2,
-  },
-  {
-    id: 3,
-    pre_title: (
-      <>
-        Professional <br /> Digitization
-      </>
-    ),
-    title: (
-      <>
-        Advanced Scanning <br /> Technology
-      </>
-    ),
-    img: slider_img_3,
-  },
-];
+const slider_data = [1, 2, 3];
 
 const HeroBanner = () => {
-  const [loop,setLoop] = useState(false);
-  useEffect(() => setLoop(true),[]);
-  return (
-    <>
-      <section className="slider__area">
-        <Swiper
-          className="slider__active slider__active-13 swiper-container"
-          slidesPerView={1}
-          spaceBetween={0}
-          effect="fade"
-          loop={loop}
-          modules={[EffectFade]}
-        >
-          {slider_data.map((item) => (
-            <SwiperSlide
-              key={item.id}
-              className="slider__item-13 slider__height-13 grey-bg-17 d-flex align-items-end"
-            >
-              <div className="container">
-                <div className="row align-self-end">
-                  <div className="col-xl-6 col-lg-6">
-                    <div className="slider__content-13">
-                      <span className="slider__title-pre-13">
-                        {item.pre_title}
-                      </span>
-                      <h3 className="slider__title-13">{item.title}</h3>
+  const [loop, setLoop] = useState(false);
+  const { t, locale } = useI18n();
 
-                      <div className="slider__btn-13 ">
-                        <Link href="/products" className="tp-btn-border">
-                          Learn More
-                          <span>
-                            <RightArrow />
-                          </span>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-xl-6 col-lg-6">
-                    <div className="slider__thumb-13 text-end mr-40">
-                      <span className="slider__thumb-13-circle-1"></span>
-                      <span className="slider__thumb-13-circle-2"></span>
-                      <Image
-                        src={item.img}
-                        alt="slider img"
-                        priority
-                      />
+  useEffect(() => setLoop(true), []);
+
+  return (
+    <section className="slider__area hero-solid">
+      <Swiper
+        className="slider__active slider__active-13 swiper-container hero-solid-swiper"
+        slidesPerView={1}
+        spaceBetween={0}
+        effect="fade"
+        loop={loop}
+        modules={[EffectFade, Autoplay]}
+        speed={900}
+        autoplay={{
+          delay: 5200,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+      >
+        {slider_data.map((id) => (
+          <SwiperSlide
+            key={id}
+            className="slider__item-13 slider__height-13 d-flex align-items-center hero-solid-slide"
+          >
+            <div className="container">
+              <div className="row">
+                <div className="col-xxl-7 col-xl-8 col-lg-9">
+                  <div className="slider__content-13 hero-solid-content">
+                    <span className="slider__title-pre-13 pb-20">{t(`hero.slide${id}.preTitle`)}</span>
+                    <h3 className="slider__title-13">{t(`hero.slide${id}.title`)}</h3>
+                    <p className="hero-solid-description">{t(`hero.slide${id}.description`)}</p>
+
+                    <div className="slider__btn-13 hero-solid-actions">
+                      <Link href={`/${locale}/products`} className="tp-btn-2">
+                        {t("hero.actions.solutions")}
+                        <span className="pl-10">
+                          <RightArrow />
+                        </span>
+                      </Link>
+                      <Link href={`/${locale}/contact`} className="tp-btn-border">
+                        {t("hero.actions.contact")}
+                      </Link>
                     </div>
                   </div>
                 </div>
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </section>
-    </>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </section>
   );
 };
 

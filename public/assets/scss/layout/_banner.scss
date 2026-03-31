@@ -101,3 +101,96 @@
         }
     }
 }
+
+.hero-solid {
+    & .hero-solid-swiper {
+        width: 100%;
+    }
+
+    & .hero-solid-slide {
+        min-height: clamp(520px, 72vh, 760px);
+        background-image: linear-gradient(100deg, rgba(3, 4, 28, 0.98) 0%, rgba(3, 4, 28, 0.68) 55%, rgba(3, 4, 28, 0.1) 100%), url('/assets/img/banner/hero-1.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    & .hero-solid-content {
+        max-width: 760px;
+        color: var(--tp-common-white);
+        padding: 96px 0;
+
+        & .hero-solid-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        & .slider__title-pre-13 {
+            display: inline-block;
+            margin-bottom: 14px;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--tp-common-white);
+            opacity: 0.88;
+
+                &:after {
+                    height: 20px;
+                }
+        }
+
+        & .slider__title-13 {
+            color: var(--tp-common-white);
+            line-height: 1.08;
+            font-size: clamp(2rem, 4.5vw, 4.4rem);
+            margin-bottom: 16px;
+        }
+
+        & .hero-solid-description {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            line-height: 1.6;
+            color: var(--tp-common-white);
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 620px;
+        }
+
+        & .tp-btn-border {
+            border-color: var(--tp-common-white);
+            color: var(--tp-common-white);
+
+            &:hover {
+                border-color: var(--tp-theme-1);
+                background-color: var(--tp-theme-1);
+                color: var(--tp-common-white);
+            }
+        }
+    }
+
+    @media #{$lg,$md,$sm} {
+        & .hero-solid-content {
+            padding: 72px 0;
+
+            & .hero-solid-description {
+                margin-bottom: 22px;
+            }
+        }
+    }
+
+    @media #{$xs} {
+        & .hero-solid-slide {
+            min-height: 520px;
+        }
+
+        & .hero-solid-content {
+            padding: 56px 0;
+
+            & .hero-solid-actions {
+                gap: 10px;
+            }
+        }
+    }
+}
