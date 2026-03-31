@@ -50,6 +50,9 @@
       ],
       "@elements/*": [
         "./src/elements/*"
+      ],
+      "src/*": [
+        "./src/*"
       ]
     },
     "resolveJsonModule": true,
