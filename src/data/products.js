@@ -9,7 +9,8 @@ const products = [
     price: 12500,
     originalPrice: 15000,
     discount: 17,
-    category: "Professional Scanners",
+    category: "Информационные системы",
+    categorySlug: "information-systems",
     topRated: true,
     description: "High-resolution scanner for books and documents with automatic page detection",
     specifications: {
@@ -26,7 +27,8 @@ const products = [
     price: 8500,
     originalPrice: 10000,
     discount: 15,
-    category: "RFID Technology",
+    category: "Антикражные системы",
+    categorySlug: "anti-theft-systems",
     topRated: true,
     description: "Advanced RFID security gate system for library entrance/exit control",
     specifications: {
@@ -43,7 +45,8 @@ const products = [
     price: 6500,
     originalPrice: 7500,
     discount: 13,
-    category: "Additional Equipment",
+    category: "Станции выдачи",
+    categorySlug: "issue-stations",
     topRated: true,
     description: "Compact self-service terminal for library patron self-checkout",
     specifications: {
@@ -60,7 +63,8 @@ const products = [
     price: 18000,
     originalPrice: 22000,
     discount: 18,
-    category: "Professional Scanners",
+    category: "Информационные системы",
+    categorySlug: "information-systems",
     topRated: true,
     description: "Professional archive scanner for fragile and large-format documents",
     specifications: {
@@ -78,7 +82,8 @@ const products = [
     price: 3500,
     originalPrice: 4000,
     discount: 13,
-    category: "Professional Scanners",
+    category: "Информационные системы",
+    categorySlug: "information-systems",
     bestSelling: true,
     description: "High-quality flatbed scanner for documents and photos",
     specifications: {
@@ -95,7 +100,8 @@ const products = [
     price: 9500,
     originalPrice: 11000,
     discount: 14,
-    category: "Professional Scanners",
+    category: "Информационные системы",
+    categorySlug: "information-systems",
     bestSelling: true,
     description: "Overhead scanner with automatic book cradle for bound materials",
     specifications: {
@@ -112,7 +118,8 @@ const products = [
     price: 15000,
     originalPrice: 18000,
     discount: 17,
-    category: "Professional Scanners",
+    category: "Информационные системы",
+    categorySlug: "information-systems",
     bestSelling: true,
     description: "Digital microfilm scanner for archive digitization",
     specifications: {
@@ -129,7 +136,8 @@ const products = [
     price: 2500,
     originalPrice: 3000,
     discount: 17,
-    category: "Professional Scanners",
+    category: "Информационные системы",
+    categorySlug: "information-systems",
     bestSelling: true,
     description: "Portable document scanner for mobile scanning needs",
     specifications: {
@@ -147,7 +155,8 @@ const products = [
     price: 1500,
     originalPrice: 1800,
     discount: 17,
-    category: "RFID Technology",
+    category: "Считыватели",
+    categorySlug: "readers",
     latestProduct: true,
     description: "Compact RFID reader for library circulation desks",
     specifications: {
@@ -164,7 +173,8 @@ const products = [
     price: 2800,
     originalPrice: 3200,
     discount: 13,
-    category: "RFID Technology",
+    category: "RFID метки и карты",
+    categorySlug: "rfid-tags-cards",
     latestProduct: true,
     description: "Professional RFID tag encoding and programming station",
     specifications: {
@@ -181,7 +191,8 @@ const products = [
     price: 12000,
     originalPrice: 14000,
     discount: 14,
-    category: "RFID Technology",
+    category: "Информационные системы",
+    categorySlug: "information-systems",
     latestProduct: true,
     description: "Complete RFID-based inventory management system",
     specifications: {
@@ -198,7 +209,8 @@ const products = [
     price: 3500,
     originalPrice: 4200,
     discount: 17,
-    category: "RFID Technology",
+    category: "Считыватели",
+    categorySlug: "readers",
     latestProduct: true,
     description: "Handheld RFID reader for mobile inventory checking",
     specifications: {
@@ -207,7 +219,7 @@ const products = [
       bluetooth: "Bluetooth connectivity",
     }
   },
-  // Additional Equipment (not in tabs - background data)
+  // Additional catalog products
   {
     id: 13,
     _id: "proinfo-kiosk-001",
@@ -216,7 +228,8 @@ const products = [
     price: 5500,
     originalPrice: 6500,
     discount: 15,
-    category: "Additional Equipment",
+    category: "Инфокиоски",
+    categorySlug: "infokiosks",
     description: "Interactive information kiosk with touchscreen",
     specifications: {
       screen: "32 inch display",
@@ -232,7 +245,8 @@ const products = [
     price: 1800,
     originalPrice: 2200,
     discount: 18,
-    category: "Additional Equipment",
+    category: "Компьютеры",
+    categorySlug: "computers",
     description: "Complete computer workstation for library patrons",
     specifications: {
       processor: "Intel i5",
@@ -248,7 +262,8 @@ const products = [
     price: 800,
     originalPrice: 1000,
     discount: 20,
-    category: "Additional Equipment",
+    category: "Принтеры",
+    categorySlug: "printers",
     description: "Reliable printer for library patron printing services",
     specifications: {
       speed: "40 pages/min",
@@ -264,7 +279,8 @@ const products = [
     price: 25000,
     originalPrice: 30000,
     discount: 17,
-    category: "AI Technology",
+    category: "Распознавание",
+    categorySlug: "recognition",
     description: "Interactive AI-powered robot assistant for libraries",
     specifications: {
       ai: "Advanced AI",

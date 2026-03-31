@@ -1,41 +1,21 @@
 import React from "react";
-// internal
-import Loader from "@components/loader/loader";
 import ErrorMessage from "@components/error-message/error";
-import { useGetRelatedProductsQuery } from "src/redux/features/productApi";
 import SingleProduct from "@components/products/single-product";
+import productsData from "@data/products";
 
-
-const RelatedProducts = ({id,tags}) => {
-  const {
-    data,
-    isLoading,
-    isError,
-  } = useGetRelatedProductsQuery({ id, tags });
-
-  const relatedProducts = data?.product
+const RelatedProducts = ({ id, category }) => {
+  const relatedProducts = productsData
+    .filter((product) => product._id !== id && product.category === category)
+    .slice(0, 4);
 
 
   let content = null;
 
-  if (isLoading) {
-    content = (
-      <>
-        <Loader loading={isLoading} />
-      </>
-    );
-  }
-
-  if (!isLoading && isError) {
-    content = <ErrorMessage message="There was an error!" />;
-  }
-
-  if (!isLoading && !isError && relatedProducts?.length === 0) {
+  if (relatedProducts.length === 0) {
     content = <ErrorMessage message="No related products found!" />;
   }
 
-  if (!isLoading && !isError && relatedProducts?.length > 0) {
-    console.log(relatedProducts);
+  if (relatedProducts.length > 0) {
     content = relatedProducts.map((product) => (
       <div key={product._id} className="col-lg-3 col-md-6">
         <SingleProduct product={product} />

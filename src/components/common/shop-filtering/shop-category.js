@@ -1,40 +1,19 @@
 import React from "react";
-import { useRouter } from "next/navigation";
-
-// ProInfo Equipment Categories
-const proInfoCategories = [
-  {
-    _id: "cat-1",
-    parent: "Scanning Solutions",
-    children: ["Professional Scanners", "Archive Scanners", "Book Scanners", "Document Scanners"]
-  },
-  {
-    _id: "cat-2", 
-    parent: "RFID Technology",
-    children: ["RFID Gates", "RFID Readers", "RFID Tags", "Stock Management"]
-  },
-  {
-    _id: "cat-3",
-    parent: "Additional Equipment",
-    children: ["Self-Service Terminals", "Information Kiosks", "Computers", "Printers"]
-  },
-  {
-    _id: "cat-4",
-    parent: "AI Technology",
-    children: ["AI Assistants", "Smart Systems"]
-  }
-];
+import Link from "next/link";
+import { useI18n } from "@i18n/i18n-context";
+import { getCategoryGroups } from "@data/catalog-categories";
 
 const ShopCategory = () => {
-  const router = useRouter();
+  const { locale } = useI18n();
+  const categoryGroups = getCategoryGroups();
 
   return (
     <div className="accordion-item">
       <div className="sidebar__widget-content">
         <div className="categories">
           <div id="accordion-items">
-            {proInfoCategories.map((category, i) => (
-              <div key={category._id} className="card">
+            {categoryGroups.map((group, i) => (
+              <div key={group.key} className="card">
                 <div className="card-header white-bg" id={`heading-${i + 1}`}>
                   <h5 className="mb-0">
                     <button
@@ -44,7 +23,7 @@ const ShopCategory = () => {
                       aria-expanded={i === 0 ? "true" : "false"}
                       aria-controls={`#collapse-${i + 1}`}
                     >
-                      {category.parent}
+                      {group.name}
                     </button>
                   </h5>
                 </div>
@@ -58,22 +37,11 @@ const ShopCategory = () => {
                   <div className="card-body">
                     <div className="categories__list">
                       <ul>
-                        {category.children.map((item, index) => (
-                          <li key={index}>
-                            <a
-                              onClick={() =>
-                                router.push(
-                                  `/shop?category=${item
-                                    .toLowerCase()
-                                    .replace("&", "")
-                                    .split(" ")
-                                    .join("-")}`
-                                )
-                              }
-                              style={{ cursor: "pointer", textTransform: "capitalize" }}
-                            >
-                              {item}
-                            </a>
+                        {group.categories.map((category) => (
+                          <li key={category.slug}>
+                            <Link href={`/${locale}/category/${category.slug}/products`}>
+                              {category.name}
+                            </Link>
                           </li>
                         ))}
                       </ul>

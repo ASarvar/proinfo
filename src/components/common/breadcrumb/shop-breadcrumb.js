@@ -2,7 +2,13 @@ import React from "react";
 import Link from "next/link";
 import { Home } from "@svg/index";
 
-const ShopBreadcrumb = () => {
+const ShopBreadcrumb = ({
+  locale,
+  groupName,
+  categoryName,
+}) => {
+  const homeHref = locale ? `/${locale}` : "/";
+
   return (
     <section className="breadcrumb__area breadcrumb__style-9 pt-13 pb-55 include-bg">
       <div className="container">
@@ -14,12 +20,28 @@ const ShopBreadcrumb = () => {
                   <Home />
                 </span>
                 <span>
-                  <Link href="/">Home</Link>
+                  <Link href={homeHref}>Home</Link>
                 </span>
                 <span className="dvdr">
                   <i className="fa-regular fa-angle-right"></i>
                 </span>
                 <span>Products</span>
+                {groupName && (
+                  <>
+                    <span className="dvdr">
+                      <i className="fa-regular fa-angle-right"></i>
+                    </span>
+                    <span>{groupName}</span>
+                  </>
+                )}
+                {categoryName && (
+                  <>
+                    <span className="dvdr">
+                      <i className="fa-regular fa-angle-right"></i>
+                    </span>
+                    <span>{categoryName}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>

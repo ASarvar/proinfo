@@ -15,15 +15,22 @@ const ProductDetailsArea = ({ product }) => {
   const {
     _id,
     image,
-    relatedImages,
+    relatedImages = [],
     title,
     quantity,
+    price,
     originalPrice,
     discount,
     tags,
     sku,
+    category,
   } = product || {};
   const [activeImg, setActiveImg] = useState(image);
+  const gallery = relatedImages.length > 0 ? relatedImages : [image].filter(Boolean);
+  const stockQuantity = quantity ?? 1;
+  const displaySku = sku || _id;
+  const categoryName = typeof category === "string" ? category : category?.name;
+  const displayOriginalPrice = originalPrice || price || 0;
   useEffect(() => {
     setActiveImg(image);
   }, [image]);
@@ -66,7 +73,7 @@ const ProductDetailsArea = ({ product }) => {
               <div className="product__details-thumb-nav tp-tab">
                 <nav>
                   <div className="d-flex justify-content-center flex-wrap">
-                    {relatedImages.map((img, i) => (
+                    {gallery.map((img, i) => (
                       <button
                         key={i}
                         onClick={() => setActiveImg(img)}
@@ -83,7 +90,7 @@ const ProductDetailsArea = ({ product }) => {
           <div className="col-xl-5 col-lg-6">
             <div className="product__details-wrapper">
               <div className="product__details-stock">
-                <span>{quantity} In Stock</span>
+                <span>{stockQuantity} In Stock</span>
               </div>
               <h3 className="product__details-title">{title}</h3>
 
@@ -93,7 +100,7 @@ const ProductDetailsArea = ({ product }) => {
               </p>
 
               {/* Product Details Price */}
-              <ProductDetailsPrice price={originalPrice} discount={discount} />
+              <ProductDetailsPrice price={displayOriginalPrice} discount={discount || 0} />
               {/* Product Details Price */}
 
               {/* quantity */}
@@ -124,10 +131,10 @@ const ProductDetailsArea = ({ product }) => {
               </div>
               <div className="product__details-sku product__details-more">
                 <p>SKU:</p>
-                <span>{sku}</span>
+                <span>{displaySku}</span>
               </div>
               {/* ProductDetailsCategories */}
-              <ProductDetailsCategories name={product?.category?.name} />
+              <ProductDetailsCategories name={categoryName} />
               {/* ProductDetailsCategories */}
 
               {/* Tags */}

@@ -7,29 +7,57 @@ import Footer from "@layout/footer";
 import ShopBreadcrumb from "@components/common/breadcrumb/shop-breadcrumb";
 import ShopArea from "@components/shop/shop-area";
 import productsData from "@data/products";
+import { getCategoryBySlug } from "@data/catalog-categories";
 
-export default function ShopMainArea({ Category, category, brand, priceMin, max, priceMax, color }) {
+const belongsToCategory = (product, selectedSlug) => {
+  if (!selectedSlug) {
+    return true;
+  }
+
+  // Preferred path: use normalized category slug from product data.
+  if (product?.categorySlug) {
+    let currentSlug = product.categorySlug;
+
+    while (currentSlug) {
+      if (currentSlug === selectedSlug) {
+        return true;
+      }
+
+      const currentCategory = getCategoryBySlug(currentSlug);
+      currentSlug = currentCategory?.parentSlug;
+    }
+
+    return false;
+  }
+
+  // Fallback for legacy data without categorySlug.
+  return (
+    product.category?.toLowerCase().replace("&", "").split(" ").join("-") === selectedSlug
+  );
+};
+
+export default function ShopMainArea({
+  Category,
+  category,
+  brand,
+  priceMin,
+  max,
+  priceMax,
+  color,
+  locale,
+  groupName,
+  categoryName,
+}) {
   // Use mock data instead of API
   const products = productsData;
   let all_products = products;
   let product_items = all_products;
 
   if (Category) {
-    product_items = product_items.filter(
-      (product) =>
-        product.category.toLowerCase().replace("&", "").split(" ").join("-") ===
-        Category
-    );
+    product_items = product_items.filter((product) => belongsToCategory(product, Category));
   }
   if (category) {
-    product_items = product_items.filter(
-      (product) =>
-        product.category
-          .toLowerCase()
-          .replace("&", "")
-          .split(" ")
-          .join("-") === category
-    );
+    product_items = product_items.filter((product) => belongsToCategory(product, category));
   }
   if (priceMin || max || priceMax) {
     product_items = product_items.filter((product) => {
@@ -55,7 +83,7 @@ export default function ShopMainArea({ Category, category, brand, priceMin, max,
   return (
     <Wrapper>
       <Header style_2={true} />
-      <ShopBreadcrumb />
+      <ShopBreadcrumb locale={locale} groupName={groupName} categoryName={categoryName} />
       {content}
       {/* <ShopCta /> */}
       <Footer />

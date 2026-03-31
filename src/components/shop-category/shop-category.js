@@ -4,43 +4,32 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Scrollbar } from "swiper/modules";
 // internal
 import SingleCategory from "./single-category";
+import { getCategoryGroups } from "@data/catalog-categories";
+import { useI18n } from "@i18n/i18n-context";
 
-// ProInfo Solutions Data
-const solutions_data = [
-  {
-    id: 1,
-    parent: "Information Systems",
-    img: "/assets/img/product/category/category-1.jpg",
-    description: "Automation systems, electronic catalogs, and cloud solutions"
-  },
-  {
-    id: 2,
-    parent: "RFID Technology",
-    img: "/assets/img/product/category/category-2.jpg",
-    description: "Radio-frequency identification for library automation"
-  },
-  {
-    id: 3,
-    parent: "Professional Scanners",
-    img: "/assets/img/product/category/category-3.jpg",
-    description: "High-quality scanners for archives and libraries"
-  },
-  {
-    id: 4,
-    parent: "AI Technology",
-    img: "/assets/img/product/category/category-4.jpg",
-    description: "Interactive robots, AR/VR, and recommendation systems"
-  },
-  {
-    id: 5,
-    parent: "Additional Equipment",
-    img: "/assets/img/product/category/category-5.jpg",
-    description: "Info kiosks, computers, printers, and resources"
-  },
-];
+const groupImageMap = {
+  rfid: "/assets/img/product/category/category-1.jpg",
+  automation: "/assets/img/product/category/category-2.jpg",
+  software: "/assets/img/product/category/category-3.jpg",
+  equipment: "/assets/img/product/category/category-4.jpg",
+  interactive: "/assets/img/product/category/category-5.jpg",
+  infrastructure: "/assets/img/product/category/category-1.jpg",
+  innovation: "/assets/img/product/category/category-2.jpg",
+};
 
 const ShopCategoryArea = () => {
   const [loop, setLoop] = useState(false);
+  const { locale } = useI18n();
+
+  const solutions_data = getCategoryGroups().map((group, index) => ({
+    id: index + 1,
+    parent: group.name,
+    img: groupImageMap[group.key] || "/assets/img/product/category/category-1.jpg",
+    link: group.categories[0]
+      ? `/${locale}/category/${group.categories[0].slug}/products`
+      : `/${locale}/category`,
+  }));
+
   useEffect(() => setLoop(true), []);
 
   return (

@@ -6,10 +6,13 @@ import { useDispatch } from "react-redux";
 import { Eye } from "@svg/index";
 import { initialOrderQuantity } from "src/redux/features/cartSlice";
 import { setProduct } from "src/redux/features/productSlice";
+import { useI18n } from "@i18n/i18n-context";
 
 const SingleProduct = ({ product }) => {
   const { _id, image, title } = product || {};
   const dispatch = useDispatch();
+  const { locale } = useI18n();
+  const detailsHref = `/${locale}/product-details/${_id}`;
 
   // handle quick view
   const handleQuickView = (prd) => {
@@ -21,7 +24,7 @@ const SingleProduct = ({ product }) => {
     <React.Fragment>
       <div className="product__item p-relative transition-3 mb-50">
         <div className="product__thumb w-img p-relative fix">
-          <Link href={`#`}>
+          <Link href={detailsHref}>
             <Image
               src={image}
               alt="product image"
@@ -40,14 +43,14 @@ const SingleProduct = ({ product }) => {
               <Eye />
               <span className="product-action-tooltip">Quick view</span>
             </button>
-            <Link href={`#`}>
+            <Link href={detailsHref}>
               <button type="button" className="product-action-btn">
                 <i className="fa-solid fa-link"></i>
                 <span className="product-action-tooltip">View Details</span>
               </button>
             </Link>
           </div>
-          <Link href={`#`}>
+          <Link href={detailsHref}>
             <div className="product__add transition-3">
               <button type="button" className="product-add-cart-btn w-100">
                 View Details
@@ -57,7 +60,7 @@ const SingleProduct = ({ product }) => {
         </div>
         <div className="product__content">
           <h3 className="product__title">
-            <Link href={`#`}>{title}</Link>
+            <Link href={detailsHref}>{title}</Link>
           </h3>
         </div>
       </div>

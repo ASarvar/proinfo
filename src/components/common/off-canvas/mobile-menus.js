@@ -9,50 +9,57 @@ const MobileMenus = () => {
   const menu_data = getMenuData(t, locale);
   const [navTitle, setNavTitle] = useState("");
   //openMobileMenu
-  const openMobileMenu = (menu) => {
-    if (navTitle === menu) {
+  const openMobileMenu = (menuKey) => {
+    if (navTitle === menuKey) {
       setNavTitle("");
     } else {
-      setNavTitle(menu);
+      setNavTitle(menuKey);
     }
   };
+
+  const renderMenuItems = (items, parentKey = "") => {
+    return items.map((menu, i) => {
+      const menuKey = `${parentKey}${menu.title}-${i}`;
+
+      if (!menu.hasDropdown) {
+        return (
+          <li key={menuKey}>
+            <Link href={menu.link}>{menu.title}</Link>
+          </li>
+        );
+      }
+
+      return (
+        <li key={menuKey} className="has-dropdown">
+          <Link href={menu.link}>{menu.title}</Link>
+          <ul
+            className="submenu"
+            style={{
+              display: navTitle === menuKey ? "block" : "none",
+            }}
+          >
+            {renderMenuItems(menu.submenus || [], `${menuKey}-`)}
+          </ul>
+          <a
+            className={`mean-expand ${navTitle === menuKey ? "mean-clicked" : ""}`}
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              openMobileMenu(menuKey);
+            }}
+            style={{ fontSize: "18px" }}
+          >
+            <i className="fal fa-plus"></i>
+          </a>
+        </li>
+      );
+    });
+  };
+
   return (
     <nav className="mean-nav">
       <ul>
-        {menu_data.map((menu, i) => (
-          <React.Fragment key={i}>
-            {!menu.hasDropdown &&<li>
-              <Link href={menu.link}>{menu.title}</Link>
-            </li>}
-            {menu.hasDropdown && (
-              <li className="has-dropdown">
-                <Link href={menu.link}>{menu.title}</Link>
-                <ul
-                  className="submenu"
-                  style={{
-                    display: navTitle === menu.title ? "block" : "none",
-                  }}
-                >
-                  {menu.submenus.map((sub, i) => (
-                    <li key={i}>
-                      <Link href={sub.link}>{sub.title}</Link>
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  className={`mean-expand ${
-                    navTitle === menu.title ? "mean-clicked" : ""
-                  }`}
-                  href="#"
-                  onClick={() => openMobileMenu(menu.title)}
-                  style={{ fontSize: "18px" }}
-                >
-                  <i className="fal fa-plus"></i>
-                </a>
-              </li>
-            )}
-          </React.Fragment>
-        ))}
+        {renderMenuItems(menu_data)}
       </ul>
     </nav>
   );

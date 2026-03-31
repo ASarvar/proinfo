@@ -3,16 +3,12 @@ import Link from "next/link";
 import React from "react";
 
 const SingleCategory = ({ item }) => {
-  const categorySlug = item.parent
-    .toLowerCase()
-    .replace("&", "")
-    .split(" ")
-    .join("-");
+  const categoryLink = item.link || "/category";
 
   return (
     <div className="product__category-item mb-20 text-center">
       <div className="product__category-thumb w-img">
-        <Link href={`/products?Category=${categorySlug}`}>
+        <Link href={categoryLink}>
           <Image
             src={item.img}
             alt={item.parent}
@@ -24,7 +20,7 @@ const SingleCategory = ({ item }) => {
       </div>
       <div className="product__category-content">
         <h3 className="product__category-title">
-          <Link href={`/products?Category=${categorySlug}`}>
+          <Link href={categoryLink}>
             {item.parent}
           </Link>
         </h3>
