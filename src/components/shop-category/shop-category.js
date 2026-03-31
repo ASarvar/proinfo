@@ -1,7 +1,7 @@
-'use client';
-import React, { useEffect, useState } from "react";
+"use client";
+import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Scrollbar } from "swiper/modules";
+import { Autoplay, Scrollbar } from "swiper/modules";
 // internal
 import SingleCategory from "./single-category";
 import { getCategoryGroups } from "@data/catalog-categories";
@@ -18,19 +18,25 @@ const groupImageMap = {
 };
 
 const ShopCategoryArea = () => {
-  const [loop, setLoop] = useState(false);
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
+  const scrollbarRef = useRef(null);
+  const localizedSolutions = t("solutions.categories");
+  const hasLocalizedSolutions = Array.isArray(localizedSolutions);
 
   const solutions_data = getCategoryGroups().map((group, index) => ({
     id: index + 1,
-    parent: group.name,
-    img: groupImageMap[group.key] || "/assets/img/product/category/category-1.jpg",
+    parent: hasLocalizedSolutions
+      ? localizedSolutions[index]?.name || group.name
+      : group.name,
+    description: hasLocalizedSolutions
+      ? localizedSolutions[index]?.description
+      : undefined,
+    img:
+      groupImageMap[group.key] || "/assets/img/product/category/category-1.jpg",
     link: group.categories[0]
       ? `/${locale}/category/${group.categories[0].slug}/products`
       : `/${locale}/category`,
   }));
-
-  useEffect(() => setLoop(true), []);
 
   return (
     <section className="product__category pt-100 pb-100">
@@ -38,8 +44,8 @@ const ShopCategoryArea = () => {
         <div className="row">
           <div className="col-xxl-12">
             <div className="section__title-wrapper text-center mb-55">
-              <h3 className="section__title">Our Solutions</h3>
-              <p>We offer a range of solutions for developing your organization</p>
+              <h3 className="section__title">{t("solutions.title")}</h3>
+              <p>{t("solutions.subtitle")}</p>
             </div>
           </div>
         </div>
@@ -50,11 +56,28 @@ const ShopCategoryArea = () => {
                 className="product__category-slider-active swiper-container"
                 slidesPerView={4}
                 spaceBetween={30}
-                loop={loop}
-                modules={[Scrollbar]}
+                loop={solutions_data.length > 4}
+                speed={800}
+                grabCursor={true}
+                watchOverflow={true}
+                modules={[Scrollbar, Autoplay]}
+                autoplay={{
+                  delay: 3600,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
                 scrollbar={{
-                  el: ".tp-scrollbar",
+                  el: scrollbarRef.current,
                   clickable: true,
+                  draggable: true,
+                }}
+                onBeforeInit={(swiper) => {
+                  if (
+                    swiper.params.scrollbar &&
+                    typeof swiper.params.scrollbar !== "boolean"
+                  ) {
+                    swiper.params.scrollbar.el = scrollbarRef.current;
+                  }
                 }}
                 breakpoints={{
                   1601: {
@@ -88,8 +111,6 @@ const ShopCategoryArea = () => {
                   </SwiperSlide>
                 ))}
               </Swiper>
-
-              <div className="tp-scrollbar"></div>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/scrollbar";
 import "swiper/css/pagination";
+import "aos/dist/aos.css";
 import "./globals.scss";
 import {
   Poppins,

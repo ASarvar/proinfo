@@ -23,6 +23,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "@stripe/react-stripe-js": "^1.16.4",
     "@stripe/stripe-js": "^1.46.0",
+    "aos": "^2.3.4",
     "bootstrap": "^5.2.3",
     "dayjs": "^1.11.7",
     "eslint": "^9.17.0",

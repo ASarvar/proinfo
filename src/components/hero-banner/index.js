@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
+import AOS from "aos";
 // internal
 import { RightArrow } from "@svg/index";
 import { useI18n } from "@i18n/i18n-context";
@@ -13,7 +14,20 @@ const HeroBanner = () => {
   const [loop, setLoop] = useState(false);
   const { t, locale } = useI18n();
 
-  useEffect(() => setLoop(true), []);
+  useEffect(() => {
+    setLoop(true);
+    AOS.init({
+      duration: 900,
+      easing: "ease-out-cubic",
+      once: false,
+      mirror: true,
+      offset: 40,
+      startEvent: "load",
+    });
+    requestAnimationFrame(() => {
+      AOS.refreshHard();
+    });
+  }, []);
 
   return (
     <section className="slider__area hero-solid">
@@ -30,6 +44,7 @@ const HeroBanner = () => {
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
+        onSlideChangeTransitionEnd={() => AOS.refreshHard()}
       >
         {slider_data.map((id) => (
           <SwiperSlide
@@ -40,11 +55,21 @@ const HeroBanner = () => {
               <div className="row">
                 <div className="col-xxl-7 col-xl-8 col-lg-9">
                   <div className="slider__content-13 hero-solid-content">
-                    <span className="slider__title-pre-13 pb-20">{t(`hero.slide${id}.preTitle`)}</span>
-                    <h3 className="slider__title-13">{t(`hero.slide${id}.title`)}</h3>
-                    <p className="hero-solid-description">{t(`hero.slide${id}.description`)}</p>
+                    <span className="slider__title-pre-13 pb-20" data-aos="fade-down" data-aos-delay="50">
+                      {t(`hero.slide${id}.preTitle`)}
+                    </span>
+                    <h3 className="slider__title-13" data-aos="fade-up" data-aos-delay="130">
+                      {t(`hero.slide${id}.title`)}
+                    </h3>
+                    <p
+                      className="hero-solid-description"
+                      data-aos="slide-up"
+                      data-aos-delay="210"
+                    >
+                      {t(`hero.slide${id}.description`)}
+                    </p>
 
-                    <div className="slider__btn-13 hero-solid-actions">
+                    <div className="slider__btn-13 hero-solid-actions" data-aos="fade-up" data-aos-delay="290">
                       <Link href={`/${locale}/products`} className="tp-btn-2">
                         {t("hero.actions.solutions")}
                         <span className="pl-10">

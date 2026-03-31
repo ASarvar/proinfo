@@ -135,11 +135,20 @@
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--tp-common-white);
-            opacity: 0.88;
 
                 &:after {
                     height: 20px;
                 }
+        }
+
+        & .slider__title-pre-13[data-aos] {
+            opacity: 0;
+            @include transform(translateY(-12px));
+        }
+
+        & .slider__title-pre-13[data-aos].aos-animate {
+            opacity: 0.88;
+            @include transform(translateY(0));
         }
 
         & .slider__title-13 {
@@ -153,9 +162,18 @@
             font-size: clamp(1rem, 1.5vw, 1.2rem);
             line-height: 1.6;
             color: var(--tp-common-white);
-            opacity: 0.9;
             margin-bottom: 30px;
             max-width: 620px;
+        }
+
+        & .hero-solid-description[data-aos] {
+            opacity: 0 !important;
+            @include transform(translateY(14px));
+        }
+
+        & .hero-solid-description[data-aos].aos-animate {
+            opacity: 0.9 !important;
+            @include transform(translateY(0));
         }
 
         & .tp-btn-border {

@@ -4,3 +4,36 @@
 @import 'node_modules/react-tooltip/dist/react-tooltip.css';
 @import '@assets/css/nice-select.css';
 @import '@assets/scss/main.scss';
+
+.product__category-thumb {
+	overflow: hidden;
+	border-radius: 8px;
+}
+
+.product__category-thumb img {
+	transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.55s ease;
+}
+
+.product__category-thumb:hover img {
+	transform: scale(0.9);
+  filter: brightness(0.9);  
+  border-radius: 6px;
+	filter: saturate(1.06);
+}
+
+.product__category-title a {
+	transition: color 0.3s ease, letter-spacing 0.3s ease;
+}
+
+.product__category-title a:hover {
+	color: var(--tp-theme-1);
+	letter-spacing: 0.01em;
+}
+
+.product__category-description {
+	transition: color 0.3s ease;
+}
+
+.product__category-content:hover .product__category-description {
+	color: var(--tp-text-1);
+}
