@@ -13,45 +13,43 @@
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
-    "baseUrl": ".",
-    "ignoreDeprecations": "5.0",
+    "moduleResolution": "bundler",
     "paths": {
       "@assets/*": [
-        "public/assets/*"
+        "./public/assets/*"
       ],
       "@components/*": [
-        "src/components/*"
+        "./src/components/*"
       ],
       "@data/*": [
-        "src/data/*"
+        "./src/data/*"
       ],
       "@hooks/*": [
-        "src/hooks/*"
+        "./src/hooks/*"
       ],
       "@i18n/*": [
-        "src/i18n/*"
+        "./src/i18n/*"
       ],
       "@layout/*": [
-        "src/layout/*"
+        "./src/layout/*"
       ],
       "@lib/*": [
-        "src/lib/*"
+        "./src/lib/*"
       ],
       "@styles/*": [
-        "src/styles/*"
+        "./src/styles/*"
       ],
       "@svg/*": [
-        "src/svg/*"
+        "./src/svg/*"
       ],
       "@ui/*": [
-        "src/ui/*"
+        "./src/ui/*"
       ],
       "@utils/*": [
-        "src/utils/*"
+        "./src/utils/*"
       ],
       "@elements/*": [
-        "src/elements/*"
+        "./src/elements/*"
       ]
     },
     "resolveJsonModule": true,
@@ -70,6 +68,7 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "prisma"
   ]
 }
