@@ -4,7 +4,9 @@ export const metadata = {
   title: "Search Product - Harri Shop",
 };
 
-export default function SearchPage({searchParams:{query}}) {
+export default async function SearchPage({ searchParams }) {
+  const query = (await searchParams)?.query || "";
+
   return (
     <SearchAreaMain searchText={query} />
   );
