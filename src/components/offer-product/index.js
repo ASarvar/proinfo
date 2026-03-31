@@ -68,7 +68,7 @@ const OfferPopularProduct = () => {
           </div>
           <div className="col-xl-6 col-md-6">
             <div className="product__offer-btn mb-30 text-md-end">
-              <Link href="/shop" className="tp-btn">
+              <Link href="/products" className="tp-btn">
                 View All Products
               </Link>
             </div>

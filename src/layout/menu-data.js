@@ -1,24 +1,24 @@
-const menu_data = [
+const getMenuData = (t, locale) => [
   {
     id: 1,
-    title: 'Home',
-    link: '/',
+    title: t("nav.home"),
+    link: `/${locale}`,
   },
   {
     id: 2,
-    title: 'About',
-    link: '/about'
+    title: t("nav.about"),
+    link: `/${locale}/about`,
   },
   {
     id: 3,
-    title: 'Products',
-    link: '/products'
+    title: t("nav.products"),
+    link: `/${locale}/products`,
   },
   {
     id: 4,
-    title: 'Contact',
-    link: '/contact'
+    title: t("nav.contact"),
+    link: `/${locale}/contact`,
   },
-]
+];
 
-export default menu_data;
+export default getMenuData;

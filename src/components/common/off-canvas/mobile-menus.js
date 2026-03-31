@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 // internal
-import menu_data from "@layout/menu-data";
+import getMenuData from "@layout/menu-data";
+import { useI18n } from "@i18n/i18n-context";
 
 const MobileMenus = () => {
-  const [subMenu, setSubMenu] = useState("");
+  const { t, locale } = useI18n();
+  const menu_data = getMenuData(t, locale);
   const [navTitle, setNavTitle] = useState("");
   //openMobileMenu
   const openMobileMenu = (menu) => {

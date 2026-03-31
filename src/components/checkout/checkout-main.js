@@ -30,7 +30,7 @@ export default function CheckoutMainArea() {
       {cart_products.length === 0 ? (
         <div className="text-center pt-80 pb-80">
           <h3 className="py-2">No items found in cart to checkout</h3>
-          <Link href="/shop" className="tp-btn">
+          <Link href="/products" className="tp-btn">
             Return to shop
           </Link>
         </div>

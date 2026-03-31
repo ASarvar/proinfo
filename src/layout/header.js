@@ -7,9 +7,12 @@ import Menus from "./menus";
 import logo from "@assets/img/logo/logo.svg";
 import useSticky from "@hooks/use-sticky";
 import OffCanvas from "@components/common/off-canvas";
+import LanguageSwitcher from "@components/common/language-switcher";
+import { useI18n } from "@i18n/i18n-context";
 
 const Header = ({ style_2 = false }) => {
   const { sticky } = useSticky();
+  const { t, locale } = useI18n();
   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
 
   return (
@@ -27,7 +30,7 @@ const Header = ({ style_2 = false }) => {
                 <div className="row align-items-center">
                   <div className="col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-5 col-8">
                     <div className="logo">
-                      <Link href="/">
+                      <Link href={`/${locale}`}>
                         <Image src={logo} alt="ProInfo Logo" />
                       </Link>
                     </div>
@@ -41,9 +44,12 @@ const Header = ({ style_2 = false }) => {
                   </div>
                   <div className="col-xxl-2 col-xl-2 col-lg-8 col-md-8 col-sm-7 col-4">
                     <div className="header__bottom-right-13 d-flex justify-content-end align-items-center pl-30">
+                      <div className="mr-10 mr-md-15">
+                        <LanguageSwitcher />
+                      </div>
                       <div className="header__action-13 d-none d-md-block">
-                        <Link href="/contact" className="tp-btn-border">
-                          Contact Us
+                        <Link href={`/${locale}/contact`} className="tp-btn-border">
+                          {t("nav.contactUs")}
                         </Link>
                       </div>
                       <div className="header__hamburger ml-30 d-xl-none">

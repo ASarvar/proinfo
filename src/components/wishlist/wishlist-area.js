@@ -18,7 +18,7 @@ const WishlistArea = () => {
                 <div className="table-content table-responsive">
                   <div className="tp-continue-shopping">
                     <p>
-                      <Link href="/shop">
+                      <Link href="/products">
                         Continue Shopping <i className="fal fa-reply"></i>
                       </Link>
                     </p>

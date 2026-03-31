@@ -8,6 +8,7 @@
         "@components/*": ["src/components/*"],
         "@data/*": ["src/data/*"],
         "@hooks/*": ["src/hooks/*"],
+        "@i18n/*": ["src/i18n/*"],
         "@layout/*": ["src/layout/*"],
         "@lib/*": ["src/lib/*"],
         "@styles/*": ["src/styles/*"],

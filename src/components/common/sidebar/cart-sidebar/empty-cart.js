@@ -10,7 +10,7 @@ const EmptyCart = ({ search_prd = false }) => {
       <Image src={empty_img} alt="empty img" />
       <p>{search_prd ? `Sorry,😥 we can not find this product` : `Your Cart is empty`}</p>
       {!search_prd && (
-        <Link href="/shop" className="tp-btn">
+        <Link href="/products" className="tp-btn">
           Go to Shop
         </Link>
       )}

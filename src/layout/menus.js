@@ -1,8 +1,14 @@
+"use client";
+
 import Link from 'next/link';
 import React from 'react';
-import menu_data from './menu-data';
+import getMenuData from './menu-data';
+import { useI18n } from '@i18n/i18n-context';
 
 const Menus = () => {
+  const { t, locale } = useI18n();
+  const menu_data = getMenuData(t, locale);
+
   return (
     <ul>
       {menu_data.map((menu, i) => (

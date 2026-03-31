@@ -1,9 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 // internal
 import logo from '@assets/img/logo/logo-black.svg';
 import SocialLinks from "@components/social";
 import CopyrightText from "./copyright-text";
+import { useI18n } from "@i18n/i18n-context";
 
 // single widget
 function SingleWidget({ col, col_2, col_3, title, contents }) {
@@ -28,6 +31,8 @@ function SingleWidget({ col, col_2, col_3, title, contents }) {
 }
 
 const Footer = () => {
+  const { t, locale } = useI18n();
+
   return (
     <>
       <footer>
@@ -41,7 +46,7 @@ const Footer = () => {
                 <div className="col-xxl-5 col-xl-3 col-lg-3 col-md-5 col-sm-6">
                   <div className="footer__widget footer__widget-11 mb-50 footer-col-11-1">
                     <div className="footer__logo">
-                      <Link href="/">
+                      <Link href={`/${locale}`}>
                         <Image src={logo} alt="logo" />
                       </Link>
                     </div>
@@ -49,7 +54,7 @@ const Footer = () => {
                     <div className="footer__widget-content">
                       <div className="footer__info">
                         <p>
-                          Comprehensive solutions for knowledge centers. We help libraries and information institutions implement innovations.
+                          {t("footer.aboutText")}
                         </p>
                         <div className="footer__social footer__social-11">
                           <SocialLinks/>
@@ -64,21 +69,21 @@ const Footer = () => {
                   col_2="4"
                   col_3="2"
                   contents={[
-                    { url: "/", title: "Home" },
-                    { url: "/about", title: "About Us" },
-                    { url: "/products", title: "Products" },
-                    { url: "/policy", title: "Privacy Policy" },
-                    { url: "/terms", title: "Terms & Conditions" },
+                    { url: `/${locale}`, title: t("nav.home") },
+                    { url: `/${locale}/about`, title: t("footer.aboutUs") },
+                    { url: `/${locale}/products`, title: t("nav.products") },
+                    { url: `/${locale}/policy`, title: t("footer.privacyPolicy") },
+                    { url: `/${locale}/terms`, title: t("footer.terms") },
                   ]}
                 />
 
                 <div className="col-xxl-4 col-xl-3 col-lg-3 col-md-5 col-sm-6">
                   <div className="footer__widget mb-50 footer-col-11-5">
-                    <h3 className="footer__widget-title">Talk To Us</h3>
+                    <h3 className="footer__widget-title">{t("footer.talkToUs")}</h3>
 
                     <div className="footer__widget-content">
                       <p className="footer__text">
-                        We are always open to communication. Contact us for consultation.
+                        {t("footer.talkText")}
                       </p>
                       <div className="footer__contact">
                         <div className="footer__contact-call">
