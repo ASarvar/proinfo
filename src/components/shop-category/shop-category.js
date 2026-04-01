@@ -62,7 +62,7 @@ const ShopCategoryArea = () => {
                 watchOverflow={true}
                 modules={[Scrollbar, Autoplay]}
                 autoplay={{
-                  delay: 3600,
+                  delay: 2600,
                   disableOnInteraction: false,
                   pauseOnMouseEnter: true,
                 }}

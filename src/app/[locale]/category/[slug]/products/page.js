@@ -2,12 +2,12 @@ import { notFound } from "next/navigation";
 import ShopMainArea from "@components/shop/shop-main-area";
 import {
   categoryGroups,
-  catalogCategories,
+  getTopLevelCategories,
   getCategoryBySlug,
 } from "@data/catalog-categories";
 
 export async function generateStaticParams() {
-  return catalogCategories.map((category) => ({ slug: category.slug }));
+  return getTopLevelCategories().map((category) => ({ slug: category.slug }));
 }
 
 export async function generateMetadata({ params }) {

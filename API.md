@@ -6,7 +6,15 @@ RESTful API endpoints for managing ProInfo.uz content including categories, prod
 
 **Base URL**: `http://localhost:3000/api`
 
-**Authentication**: (To be implemented)
+**Authentication**: Cookie-based admin session.
+
+Admin write endpoints (`POST`, `PUT`, `DELETE`, `PATCH`) require a valid session cookie obtained via `POST /api/admin/login`. The cookie is set automatically on successful login and cleared on `POST /api/admin/logout`.
+
+Required env vars:
+- `ADMIN_SESSION_SECRET` — signs session cookies (long random string in production)
+- `ADMIN_SUPERADMIN` — `username:password:SuperAdmin` or use `ADMIN_USERS_JSON` for multiple users
+
+Admin panel endpoints under `/api/admin/*` enforce the same cookie session and support role-based access (`SuperAdmin`, `Editor`).
 
 ---
 

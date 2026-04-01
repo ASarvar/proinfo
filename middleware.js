@@ -4,6 +4,11 @@ import { locales, defaultLocale } from './src/i18n/translations';
 export function middleware(request) {
   const pathname = request.nextUrl.pathname;
 
+  // Keep admin namespace outside locale routing.
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return NextResponse.next();
+  }
+
   // Check if locale is in pathname
   const pathnameHasLocale = locales.some(
     locale => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`

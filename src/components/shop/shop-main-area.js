@@ -6,34 +6,29 @@ import ShopCta from "@components/cta";
 import Footer from "@layout/footer";
 import ShopBreadcrumb from "@components/common/breadcrumb/shop-breadcrumb";
 import ShopArea from "@components/shop/shop-area";
-import productsData from "@data/products";
-import { getCategoryBySlug } from "@data/catalog-categories";
+import {
+  getCategoryBySlug,
+  productsWithResolvedCategories,
+  getNormalizedProductCategorySlug,
+} from "@data/catalog-categories";
 
 const belongsToCategory = (product, selectedSlug) => {
   if (!selectedSlug) {
     return true;
   }
 
-  // Preferred path: use normalized category slug from product data.
-  if (product?.categorySlug) {
-    let currentSlug = product.categorySlug;
+  let currentSlug = getNormalizedProductCategorySlug(product);
 
-    while (currentSlug) {
-      if (currentSlug === selectedSlug) {
-        return true;
-      }
-
-      const currentCategory = getCategoryBySlug(currentSlug);
-      currentSlug = currentCategory?.parentSlug;
+  while (currentSlug) {
+    if (currentSlug === selectedSlug) {
+      return true;
     }
 
-    return false;
+    const currentCategory = getCategoryBySlug(currentSlug);
+    currentSlug = currentCategory?.parentSlug;
   }
 
-  // Fallback for legacy data without categorySlug.
-  return (
-    product.category?.toLowerCase().replace("&", "").split(" ").join("-") === selectedSlug
-  );
+  return false;
 };
 
 export default function ShopMainArea({
@@ -49,7 +44,7 @@ export default function ShopMainArea({
   categoryName,
 }) {
   // Use mock data instead of API
-  const products = productsData;
+  const products = productsWithResolvedCategories;
   let all_products = products;
   let product_items = all_products;
 

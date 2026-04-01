@@ -5,12 +5,12 @@ import Header from "@layout/header";
 import Wrapper from "@layout/wrapper";
 import {
   categoryGroups,
-  catalogCategories,
+  getTopLevelCategories,
   getCategoryBySlug,
 } from "@data/catalog-categories";
 
 export async function generateStaticParams() {
-  return catalogCategories.map((category) => ({ slug: category.slug }));
+  return getTopLevelCategories().map((category) => ({ slug: category.slug }));
 }
 
 export const metadata = {
@@ -26,7 +26,7 @@ export default async function CategorySlugPage({ params }) {
   }
 
   const group = categoryGroups.find((item) => item.key === category.groupKey);
-  const relatedCategories = catalogCategories.filter(
+  const relatedCategories = getTopLevelCategories().filter(
     (item) => item.groupKey === category.groupKey && item.slug !== category.slug
   );
 
