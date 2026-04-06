@@ -34,28 +34,37 @@ const ProductDetailsArea = ({ product }) => {
   useEffect(() => {
     setActiveImg(image);
   }, [image]);
-
-  const dispatch = useDispatch();
-  const { wishlist } = useSelector((state) => state.wishlist);
-  const isWishlistAdded = wishlist.some((item) => item._id === _id);
-
-  // handle add product
-  const handleAddProduct = (prd) => {
-    dispatch(add_cart_product(prd));
-  };
-
-  // handle add wishlist
-  const handleAddWishlist = (prd) => {
-    dispatch(add_to_wishlist(prd));
-  };
-
+  const {
+    _id,
+    id,
+    image,
+    imageUrl,
+    relatedImages = [],
+    images = [],
+    title,
+    quantity,
+    price,
+    originalPrice,
+    discount,
+    tags,
+    sku,
+    category,
+    categorySlug,
+    description,
+    features = [],
+  } = product || {};
+  const primaryImage = imageUrl || image;
+  const [activeImg, setActiveImg] = useState(primaryImage);
+  const gallery = (Array.isArray(images) && images.length > 0 ? images : relatedImages).length > 0
+    ? (Array.isArray(images) && images.length > 0 ? images : relatedImages)
+    : [primaryImage].filter(Boolean);
   return (
-    <section className="product__details-area pb-115">
-      <div className="container">
+  const displaySku = sku || id || _id;
+  const categoryName = typeof category === "string" ? category : category?.name || categorySlug;
         <div className="row">
           <div className="col-xl-7 col-lg-6">
-            <div className="product__details-thumb-tab mr-70">
-              <div className="product__details-thumb-content w-img">
+    setActiveImg(primaryImage);
+  }, [primaryImage]);
                 <div>
                   <Image
                     src={activeImg}
@@ -94,10 +103,15 @@ const ProductDetailsArea = ({ product }) => {
               </div>
               <h3 className="product__details-title">{title}</h3>
 
-              <p className="mt-20">
-                Shop Harry.com for every day low prices. Free shipping on orders
-                $35+ or Pickup In-store and get
-              </p>
+              <p className="mt-20">{description || ""}</p>
+
+              {features.length > 0 && (
+                <ul style={{ margin: "18px 0 24px", paddingLeft: 18, color: "#525258", lineHeight: 1.8 }}>
+                  {features.map((feature, index) => (
+                    <li key={index}>{feature}</li>
+                  ))}
+                </ul>
+              )}
 
               {/* Product Details Price */}
               <ProductDetailsPrice price={displayOriginalPrice} discount={discount || 0} />

@@ -144,13 +144,13 @@ export default function AdminResourcePage({
   };
 
   return (
-    <section>
-      <h1 style={{ marginBottom: 6 }}>{title}</h1>
-      <p style={{ marginBottom: 16, color: "#64748b" }}>
-        Upload pipeline with metadata and {supportsPublishing ? "draft/publish workflow" : "content management"}.
+    <section style={{ fontFamily: "'Inter', sans-serif" }}>
+      <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 24, fontWeight: 700, color: "#03041C", letterSpacing: "-0.02em", margin: "0 0 6px" }}>{title}</h1>
+      <p style={{ marginBottom: 20, color: "#A3A3AA", fontSize: 14, margin: "0 0 20px" }}>
+        {supportsPublishing ? "Draft / publish workflow enabled." : "Content management."}
       </p>
 
-      <form onSubmit={onCreate} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: 14, marginBottom: 16 }}>
+      <form onSubmit={onCreate} style={{ background: "#fff", border: "1px solid #EAEAF0", borderRadius: 12, padding: 20, marginBottom: 18 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
           <input placeholder="Title" required value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} style={inputStyle} />
           <input placeholder="Slug" value={form.slug} onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))} style={inputStyle} />
@@ -176,7 +176,7 @@ export default function AdminResourcePage({
         </div>
 
         <div style={{ marginTop: 10, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <label style={{ border: "1px dashed #94a3b8", borderRadius: 8, padding: "8px 10px", cursor: "pointer", background: "#f8fafc" }}>
+          <label style={{ border: "1.5px dashed #D5D5DF", borderRadius: 8, padding: "8px 14px", cursor: "pointer", background: "#F5F6F8", fontSize: 13, color: "#525258", fontWeight: 500 }}>
             {uploading ? "Uploading..." : "Upload file"}
             <input type="file" onChange={onUpload} style={{ display: "none" }} />
           </label>
@@ -184,13 +184,21 @@ export default function AdminResourcePage({
         </div>
       </form>
 
-      {message ? <p style={{ color: "#166534" }}>{message}</p> : null}
-      {error ? <p style={{ color: "#b91c1c" }}>{error}</p> : null}
+      {message && (
+        <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 12, fontSize: 13, color: "#166534" }}>
+          {message}
+        </div>
+      )}
+      {error && (
+        <div style={{ background: "#FFF5F5", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 12, fontSize: 13, color: "#B91C1C" }}>
+          {error}
+        </div>
+      )}
 
-      <div style={{ marginTop: 12, background: "#fff", borderRadius: 12, border: "1px solid #e2e8f0", overflow: "hidden" }}>
+      <div style={{ marginTop: 14, background: "#fff", borderRadius: 12, border: "1px solid #EAEAF0", overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ background: "#f8fafc", textAlign: "left" }}>
+            <tr style={{ background: "#F5F6F8", textAlign: "left" }}>
               <th style={thStyle}>Title</th>
               <th style={thStyle}>Slug</th>
               <th style={thStyle}>Status</th>
@@ -231,32 +239,54 @@ export default function AdminResourcePage({
 }
 
 const inputStyle = {
-  border: "1px solid #cbd5e1",
+  background: "#EFF0F2",
+  border: "2px solid #EFF0F2",
   borderRadius: 8,
-  padding: "8px 10px",
+  padding: "10px 12px",
+  fontSize: 14,
+  color: "#03041C",
+  width: "100%",
+  boxSizing: "border-box",
+  fontFamily: "'Inter', sans-serif",
+  outline: "none",
 };
 
 const buttonStyle = {
   border: "none",
-  background: "#0f172a",
+  background: "#03041C",
   color: "#fff",
   borderRadius: 8,
-  padding: "8px 14px",
+  padding: "10px 16px",
+  fontSize: 14,
+  fontWeight: 600,
+  cursor: "pointer",
+  fontFamily: "'Space Grotesk', sans-serif",
+  letterSpacing: "-0.01em",
 };
 
 const smallButtonStyle = {
-  border: "1px solid #cbd5e1",
-  background: "#fff",
-  borderRadius: 8,
-  padding: "5px 8px",
+  border: "1px solid #EAEAF0",
+  background: "#F5F6F8",
+  color: "#03041C",
+  borderRadius: 6,
+  padding: "5px 10px",
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: "pointer",
+  fontFamily: "'Inter', sans-serif",
 };
 
 const thStyle = {
-  padding: "10px 12px",
-  borderBottom: "1px solid #e2e8f0",
+  padding: "11px 14px",
+  borderBottom: "1px solid #EAEAF0",
+  fontSize: 12,
+  fontWeight: 700,
+  color: "#A3A3AA",
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
 };
 
 const tdStyle = {
-  padding: "10px 12px",
+  padding: "11px 14px",
   borderBottom: "1px solid #f1f5f9",
 };

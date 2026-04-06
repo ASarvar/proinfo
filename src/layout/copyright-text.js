@@ -8,10 +8,10 @@ const CopyrightText = () => {
   const { t } = useI18n();
 
   return (
-    <p>
-      Copyright © {new Date().getFullYear()} by <Link href="https://www.proinfo.uz">ProInfo</Link> {' '}
-      {t("common.allRightsReserved")}
-    </p>
+      <>
+        Copyright © {new Date().getFullYear()} by <Link href="https://www.proinfo.uz">ProInfo</Link> {' '}
+        {t("common.allRightsReserved")}
+      </>
   );
 };
 

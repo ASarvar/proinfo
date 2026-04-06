@@ -169,8 +169,8 @@ export default function AdminProductsPage() {
 
   return (
     <section>
-      <h1 style={{ marginBottom: 4 }}>Products</h1>
-      <p style={{ marginBottom: 18, color: "#64748b" }}>
+      <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 24, fontWeight: 700, color: "#03041C", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Products</h1>
+      <p style={{ marginBottom: 20, color: "#A3A3AA", fontSize: 14, margin: "0 0 20px" }}>
         {products.length} product{products.length !== 1 ? "s" : ""} across {totalCatsWithProducts} categor{totalCatsWithProducts !== 1 ? "ies" : "y"}.
         Slug is auto-generated from title (Latin only).
       </p>
@@ -281,8 +281,8 @@ export default function AdminProductsPage() {
         </form>
       </div>
 
-      {message && <p style={{ color: "#166534", marginBottom: 10 }}>{message}</p>}
-      {error && <p style={{ color: "#b91c1c", marginBottom: 10 }}>{error}</p>}
+      {message && <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: "#166534" }}>{message}</div>}
+      {error && <div style={{ background: "#FFF5F5", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: "#B91C1C" }}>{error}</div>}
 
       {/* ── Products grouped by category group ── */}
       {productsByGroup.map((group) => {
@@ -315,9 +315,9 @@ export default function AdminProductsPage() {
       )}
 
       {!loading && products.length === 0 && (
-        <p style={{ color: "#94a3b8", marginTop: 8 }}>No products yet. Use the form above to create one.</p>
+        <p style={{ color: "#A3A3AA", marginTop: 8, fontSize: 14 }}>No products yet. Use the form above to create one.</p>
       )}
-      {loading && <p style={{ color: "#64748b", marginTop: 8 }}>Loading…</p>}
+      {loading && <p style={{ color: "#A3A3AA", marginTop: 8, fontSize: 14 }}>Loading…</p>}
     </section>
   );
 }
@@ -361,79 +361,107 @@ function ProductTable({ products, catTitleMap, onDelete }) {
 
 const cardStyle = {
   background: "#fff",
-  border: "1px solid #e2e8f0",
+  border: "1px solid #EAEAF0",
   borderRadius: 12,
-  padding: 16,
-  marginBottom: 20,
+  padding: 20,
+  marginBottom: 22,
 };
 
 const fieldStyle = { display: "flex", flexDirection: "column", gap: 4 };
 
-const labelStyle = { fontSize: 12, fontWeight: 600, color: "#374151" };
+const labelStyle = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: "#525258",
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+};
 
 const inputStyle = {
-  border: "1px solid #cbd5e1",
+  background: "#EFF0F2",
+  border: "2px solid #EFF0F2",
   borderRadius: 8,
-  padding: "8px 10px",
+  padding: "10px 12px",
   fontSize: 14,
+  color: "#03041C",
   width: "100%",
   boxSizing: "border-box",
+  fontFamily: "'Inter', sans-serif",
+  outline: "none",
 };
 
 const uploadLabelStyle = {
-  border: "1px dashed #94a3b8",
+  border: "1.5px dashed #D5D5DF",
   borderRadius: 8,
-  padding: "8px 12px",
+  padding: "8px 14px",
   cursor: "pointer",
-  background: "#f8fafc",
-  fontSize: 14,
+  background: "#F5F6F8",
+  fontSize: 13,
+  color: "#525258",
+  fontWeight: 500,
 };
 
 const btnPrimaryStyle = {
   border: "none",
-  background: "#0f172a",
+  background: "#03041C",
   color: "#fff",
   borderRadius: 8,
-  padding: "8px 16px",
+  padding: "10px 18px",
   cursor: "pointer",
   fontSize: 14,
+  fontWeight: 600,
+  fontFamily: "'Space Grotesk', sans-serif",
+  letterSpacing: "-0.01em",
 };
 
 const btnOutlineStyle = {
-  border: "1px solid #cbd5e1",
-  background: "#fff",
+  border: "1px solid #EAEAF0",
+  background: "#F5F6F8",
+  color: "#525258",
   borderRadius: 8,
-  padding: "8px 14px",
+  padding: "10px 14px",
   cursor: "pointer",
-  fontSize: 14,
+  fontSize: 13,
+  fontWeight: 500,
 };
 
 const btnDeleteStyle = {
-  border: "1px solid #fca5a5",
-  background: "#fff",
-  color: "#dc2626",
+  border: "1px solid #FECACA",
+  background: "#FFF5F5",
+  color: "#DC2626",
   borderRadius: 6,
-  padding: "4px 10px",
+  padding: "5px 11px",
   cursor: "pointer",
-  fontSize: 13,
+  fontSize: 12,
+  fontWeight: 600,
 };
 
 const groupHeaderStyle = {
-  background: "#0f172a",
+  background: "#03041C",
   color: "#fff",
   borderRadius: "10px 10px 0 0",
-  padding: "9px 14px",
-  fontWeight: 600,
-  fontSize: 14,
+  padding: "10px 16px",
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontWeight: 700,
+  fontSize: 13,
+  letterSpacing: "-0.01em",
 };
 
 const groupBodyStyle = {
   background: "#fff",
-  border: "1px solid #e2e8f0",
+  border: "1px solid #EAEAF0",
   borderTop: "none",
   borderRadius: "0 0 10px 10px",
   overflow: "hidden",
 };
 
-const thStyle = { padding: "10px 12px", borderBottom: "1px solid #e2e8f0", fontSize: 13 };
-const tdStyle = { padding: "10px 12px", borderBottom: "1px solid #f1f5f9", fontSize: 14 };
+const thStyle = {
+  padding: "10px 14px",
+  borderBottom: "1px solid #EAEAF0",
+  fontSize: 11,
+  fontWeight: 700,
+  color: "#A3A3AA",
+  textTransform: "uppercase",
+  letterSpacing: "0.07em",
+};
+const tdStyle = { padding: "10px 14px", borderBottom: "1px solid #F5F6F8", fontSize: 14 };

@@ -6,6 +6,7 @@ export const defaultLocale = "ru";
 export const translations = {
   en: {
     nav: {
+      home: "Home",
       about: "About",
       products: "Products",
       categories: "Categories",
@@ -38,6 +39,11 @@ export const translations = {
       aboutUs: "About Us",
       privacyPolicy: "Privacy Policy",
       terms: "Terms & Conditions",
+      navigation: "Navigation",
+      resources: "Resources",
+      blog: "Blog",
+      faq: "FAQ",
+      downloads: "Downloads",
     },
     offcanvas: {
       phone: "+998-77-079-66-00",
@@ -94,6 +100,7 @@ export const translations = {
   },
   ru: {
     nav: {
+      home: "Главная",
       products: "Продукты",
       categories: "Категории",
       items: "Товары",
@@ -126,6 +133,11 @@ export const translations = {
       aboutUs: "О нас",
       privacyPolicy: "Политика конфиденциальности",
       terms: "Условия и положения",
+      navigation: "Навигация",
+      resources: "Ресурсы",
+      blog: "Блог",
+      faq: "Вопросы",
+      downloads: "Загрузки",
     },
     offcanvas: {
       phone: "+998-77-079-66-00",
@@ -182,6 +194,7 @@ export const translations = {
   },
   uz: {
     nav: {
+      home: "Bosh sahifa",
       products: "Mahsulotlar",
       categories: "Kategoriyalar",
       items: "Tovarlar",
@@ -214,6 +227,11 @@ export const translations = {
       aboutUs: "Biz haqimizda",
       privacyPolicy: "Maxfiylik siyosati",
       terms: "Foydalanish shartlari",
+      navigation: "Navigatsiya",
+      resources: "Resurslar",
+      blog: "Blog",
+      faq: "FAQ",
+      downloads: "Yuklab olishlar",
     },
     offcanvas: {
       phone: "+998-77-079-66-00",

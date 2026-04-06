@@ -8,19 +8,21 @@ import SocialLinks from "@components/social";
 import CopyrightText from "./copyright-text";
 import { useI18n } from "@i18n/i18n-context";
 
-// single widget
+// single widget with updated styling
 function SingleWidget({ col, col_2, col_3, title, contents }) {
   return (
     <div
-      className={`col-xxl-${col} col-xl-${col} col-lg-3 col-md-${col_2} col-sm-6"`}
+      className={`col-xxl-${col} col-xl-${col} col-lg-3 col-md-${col_2} col-sm-6`}
     >
-      <div className={`footer__widget mb-50 footer-col-11-${col_3}`}>
+      <div className={`footer__widget mb-50 footer-col-11-${col_3} footer__widget-wrapper`}>
         <h3 className="footer__widget-title">{title}</h3>
         <div className="footer__widget-content">
-          <ul>
+          <ul className="footer__widget-list">
             {contents.map((l, i) => (
-              <li key={i}>
-                <Link href={l.url}>{l.title}</Link>
+              <li key={i} style={{ marginBottom: '10px' }}>
+                <Link href={l.url} className="footer__widget-link">
+                  {l.title}
+                </Link>
               </li>
             ))}
           </ul>
@@ -38,22 +40,24 @@ const Footer = () => {
       <footer>
         <div
           className="footer__area footer__style-4"
-          data-bg-color="footer-bg-white"
+          style={{ background: '#F5F6F8', borderTop: '1px solid #EAEAF0' }}
         >
-          <div className="footer__top" >
-            <div className="container pt-60" style={{ borderTop: '1px solid rgba(1, 15, 28, 0.1)' }}>
+          <div className="footer__top">
+            <div className="container">
               <div className="row">
-                <div className="col-xxl-5 col-xl-3 col-lg-3 col-md-5 col-sm-6">
-                  <div className="footer__widget footer__widget-11 mb-50 footer-col-11-1">
-                    <div className="footer__logo">
+
+                {/* Logo & About */}
+                <div className="col-xxl-4 col-xl-3 col-lg-3 col-md-5 col-sm-6">
+                  <div className="footer__widget mb-50 footer-col-11-1">
+                    <div className="footer__logo" style={{ marginBottom: '18px' }}>
                       <Link href={`/${locale}`}>
-                        <Image src={logo} alt="logo" />
+                        <Image src={logo} alt="ProInfo logo" style={{ height: 'auto' }} />
                       </Link>
                     </div>
 
                     <div className="footer__widget-content">
                       <div className="footer__info">
-                        <p>
+                        <p className="footer__about-text">
                           {t("footer.aboutText")}
                         </p>
                         <div className="footer__social footer__social-11">
@@ -64,10 +68,12 @@ const Footer = () => {
                   </div>
                 </div>
 
+                {/* Main Nav */}
                 <SingleWidget
-                  col="3"
+                  col="2.5"
                   col_2="4"
                   col_3="2"
+                  title={t("footer.navigation")}
                   contents={[
                     { url: `/${locale}`, title: t("nav.home") },
                     { url: `/${locale}/about`, title: t("footer.aboutUs") },
@@ -77,41 +83,61 @@ const Footer = () => {
                   ]}
                 />
 
-                <div className="col-xxl-4 col-xl-3 col-lg-3 col-md-5 col-sm-6">
+                {/* Resources / Secondary Nav */}
+                <SingleWidget
+                  col="2"
+                  col_2="4"
+                  col_3="2"
+                  title={t("footer.resources")}
+                  contents={[
+                    { url: `/${locale}/blog`, title: t("footer.blog") },
+                    { url: `/${locale}/faq`, title: t("footer.faq") },
+                    { url: `/${locale}/download`, title: t("footer.downloads") },
+                    { url: `/${locale}/contact`, title: t("nav.contactUs") },
+                  ]}
+                />
+
+                {/* Contact */}
+                <div className="col-xxl-3 col-xl-3 col-lg-3 col-md-5 col-sm-6">
                   <div className="footer__widget mb-50 footer-col-11-5">
                     <h3 className="footer__widget-title">{t("footer.talkToUs")}</h3>
 
                     <div className="footer__widget-content">
-                      <p className="footer__text">
+                      <p className="footer__about-text">
                         {t("footer.talkText")}
                       </p>
-                      <div className="footer__contact">
-                        <div className="footer__contact-call">
-                          <span>
-                            <a href="tel:+998770796600">+998-77-079-66-00</a>
-                          </span>
+                      <div className="footer__contact footer__contact-container">
+                        <div className="footer__contact-call footer__contact-item">
+                          <span className="footer__contact-icon">📞</span>
+                          <a href="tel:+998770796600" className="footer__contact-link">
+                            +998-77-079-66-00
+                          </a>
                         </div>
-                        <div className="footer__contact-mail">
-                          <span>
-                            <a href="mailto:salom@proinfo.uz">
-                              salom@proinfo.uz
-                            </a>
-                          </span>
+                        <div className="footer__contact-mail footer__contact-item">
+                          <span className="footer__contact-icon">✉️</span>
+                          <a href="mailto:salom@proinfo.uz" className="footer__contact-link">
+                            salom@proinfo.uz
+                          </a>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
-          <div className="footer__bottom">
+
+          {/* Bottom copyright */}
+          <div className="footer__bottom" style={{ background: '#fff', borderTop: '1px solid #EAEAF0', padding: '18px 0' }}>
             <div className="container">
               <div className="footer__bottom-inner">
                 <div className="row">
                   <div className="col-sm-12">
                     <div className="footer__copyright text-center">
-                      <CopyrightText />
+                      <p className="footer__copyright-text">
+                        <CopyrightText />
+                      </p>
                     </div>
                   </div>
                 </div>
