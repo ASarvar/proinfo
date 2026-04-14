@@ -129,7 +129,7 @@ const Footer = () => {
           </div>
 
           {/* Bottom copyright */}
-          <div className="footer__bottom" style={{ background: '#fff', borderTop: '1px solid #EAEAF0', padding: '18px 0' }}>
+          <div className="footer__bottom" style={{ background: '#fff', borderTop: '1px solid #EAEAF0' }}>
             <div className="container">
               <div className="footer__bottom-inner">
                 <div className="row">

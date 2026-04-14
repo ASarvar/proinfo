@@ -3,6 +3,17 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
+const NAV_ICONS = {
+  Dashboard: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>,
+  Categories: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>,
+  Products: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>,
+  Blog: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
+  Video: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>,
+  Photo: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
+  Download: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+  FAQ: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+};
+
 const links = [
   { href: "/admin/dashboard", label: "Dashboard" },
   { href: "/admin/categories", label: "Categories" },
@@ -29,34 +40,34 @@ export default function AdminShell({ children, role, username }) {
   )?.label ?? "Dashboard";
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#F5F6F8", fontFamily: "'Inter', sans-serif" }}>
+    <div className="admin-shell">
 
       {/* ── Sidebar ── */}
-      <aside style={{ width: 256, flexShrink: 0, background: "#03041C", display: "flex", flexDirection: "column" }}>
+      <aside className="admin-shell__sidebar">
 
         {/* Brand */}
-        <div style={{ padding: "26px 22px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 20, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em" }}>
+        <div className="admin-shell__brand">
+          <div className="admin-shell__brand__title">
             ProInfo
           </div>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "#E26666", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 4 }}>
+          <div className="admin-shell__brand__subtitle">
             Admin Panel
           </div>
         </div>
 
         {/* User */}
-        <div style={{ padding: "16px 22px", borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#E26666", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+        <div className="admin-shell__user">
+          <div className="admin-shell__user__avatar">
             {(username || "A").charAt(0).toUpperCase()}
           </div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", lineHeight: 1.3 }}>{username}</div>
-            <div style={{ fontSize: 11, color: "#A3A3AA", marginTop: 1 }}>{role}</div>
+          <div className="admin-shell__user__info">
+            <div className="admin-shell__user__name">{username}</div>
+            <div className="admin-shell__user__role">{role}</div>
           </div>
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, padding: "14px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
+        <nav className="admin-shell__nav">
           {links.map((link) => {
             const active =
               pathname === link.href ||
@@ -65,20 +76,11 @@ export default function AdminShell({ children, role, username }) {
               <Link
                 key={link.href}
                 href={link.href}
-                style={{
-                  display: "block",
-                  padding: "10px 12px",
-                  borderRadius: 8,
-                  textDecoration: "none",
-                  fontSize: 14,
-                  fontWeight: active ? 600 : 400,
-                  color: active ? "#fff" : "rgba(255,255,255,0.55)",
-                  background: active ? "rgba(226,102,102,0.18)" : "transparent",
-                  borderLeft: `3px solid ${active ? "#E26666" : "transparent"}`,
-                  transition: "all 0.15s ease",
-                  boxSizing: "border-box",
-                }}
+                className={`admin-shell__nav-item ${active ? "admin-shell__nav-item--active" : ""}`}
               >
+                <span className="admin-shell__nav-item__icon">
+                  {NAV_ICONS[link.label] || NAV_ICONS.Dashboard}
+                </span>
                 {link.label}
               </Link>
             );
@@ -86,23 +88,11 @@ export default function AdminShell({ children, role, username }) {
         </nav>
 
         {/* Logout */}
-        <div style={{ padding: "14px 10px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="admin-shell__logout">
           <button
             type="button"
             onClick={onLogout}
-            style={{
-              width: "100%",
-              padding: "10px 12px",
-              border: "1px solid rgba(255,255,255,0.12)",
-              background: "transparent",
-              borderRadius: 8,
-              color: "rgba(255,255,255,0.6)",
-              fontSize: 13,
-              cursor: "pointer",
-              textAlign: "left",
-              fontFamily: "'Inter', sans-serif",
-              transition: "color 0.15s",
-            }}
+            className="admin-shell__logout__btn"
           >
             Sign out
           </button>
@@ -110,28 +100,19 @@ export default function AdminShell({ children, role, username }) {
       </aside>
 
       {/* ── Main area ── */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+      <div className="admin-shell__main">
 
         {/* Top bar */}
-        <header style={{
-          background: "#fff",
-          borderBottom: "1px solid #EAEAF0",
-          height: 58,
-          padding: "0 28px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexShrink: 0,
-        }}>
-          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, fontWeight: 700, color: "#03041C", letterSpacing: "-0.01em" }}>
+        <header className="admin-shell__header">
+          <span className="admin-shell__header__title">
             {activeLabel}
           </span>
-          <span style={{ fontSize: 12, color: "#A3A3AA" }}>
+          <span className="admin-shell__header__date">
             {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
           </span>
         </header>
 
-        <main style={{ flex: 1, padding: 28, overflowY: "auto" }}>{children}</main>
+        <main className="admin-shell__content">{children}</main>
       </div>
     </div>
   );

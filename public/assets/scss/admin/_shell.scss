@@ -1,0 +1,204 @@
+// ────────────────────────────────────────────────────────────
+// Admin Shell / Layout Styles
+// ────────────────────────────────────────────────────────────
+
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #F5F6F8;
+  font-family: 'Inter', sans-serif;
+
+  // Sidebar
+  &__sidebar {
+    width: 256px;
+    flex-shrink: 0;
+    background: #03041C;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 768px) {
+      width: 220px;
+    }
+  }
+
+  // Brand
+  &__brand {
+    padding: 26px 22px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    &__title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.03em;
+    }
+
+    &__subtitle {
+      font-size: 11px;
+      font-weight: 600;
+      color: #E26666;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+  }
+
+  // User info
+  &__user {
+    padding: 16px 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &__avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #E26666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    &__info {
+      flex: 1;
+    }
+
+    &__name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    &__role {
+      font-size: 11px;
+      color: #A3A3AA;
+      margin-top: 1px;
+    }
+  }
+
+  // Navigation
+  &__nav {
+    flex: 1;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.55);
+    background: transparent;
+    border-left: 3px solid transparent;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    &--active {
+      font-weight: 600;
+      color: #fff;
+      background: rgba(226, 102, 102, 0.18);
+      border-left-color: #E26666;
+    }
+
+    &__icon {
+      flex-shrink: 0;
+      opacity: 0.7;
+
+      .admin-shell__nav-item--active & {
+        opacity: 1;
+      }
+    }
+  }
+
+  // Logout button
+  &__logout {
+    padding: 14px 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    &__btn {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: transparent;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+      transition: color 0.15s;
+
+      &:hover {
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+  }
+
+  // Main area
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  // Top bar
+  &__header {
+    background: #fff;
+    border-bottom: 1px solid #EAEAF0;
+    height: 58px;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+      padding: 0 18px;
+      height: 52px;
+    }
+
+    &__title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #03041C;
+      letter-spacing: -0.01em;
+    }
+
+    &__date {
+      font-size: 12px;
+      color: #A3A3AA;
+    }
+  }
+
+  // Content area
+  &__content {
+    flex: 1;
+    padding: 28px;
+    overflow-y: auto;
+
+    @media (max-width: 768px) {
+      padding: 18px;
+    }
+  }
+}

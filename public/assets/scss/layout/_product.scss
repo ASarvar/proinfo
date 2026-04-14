@@ -3025,6 +3025,19 @@ p.checkout-coupon button {
     margin-right: 10px;
 }
 
+.product__details-main-image {
+    width: 100%;
+    max-height: 575px;
+    object-fit: cover;
+}
+
+.product__details-feature-list {
+    margin: 18px 0 24px;
+    padding-left: 18px;
+    color: #525258;
+    line-height: 1.8;
+}
+
 .shop__sidebar{
     & .sidebar__widget-content{
         & .categories{
