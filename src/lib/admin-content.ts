@@ -250,10 +250,10 @@ export async function createAdminContent(resource: AdminResource, payload: any) 
 
     const extrasContent = Object.keys(extras).length > 0 ? JSON.stringify(extras) : content;
 
-    const translations: Record<Language, { title: string; description?: string | null; content?: string | null }> = {
-      [Language.RU]: { title, description, content: extrasContent },
-      [Language.UZ]: { title, description, content: extrasContent },
-      [Language.EN]: { title, description, content: extrasContent },
+    const translations: Record<Language, { title: string; description?: string; content?: string }> = {
+      [Language.RU]: { title, description: description ?? undefined, content: extrasContent ?? undefined },
+      [Language.UZ]: { title, description: description ?? undefined, content: extrasContent ?? undefined },
+      [Language.EN]: { title, description: description ?? undefined, content: extrasContent ?? undefined },
     };
     await createEntityTranslations("Product", row.id, translations);
     return { id: row.id, slug: row.slug };
