@@ -12,6 +12,15 @@ export type AdminSession = {
 const ADMIN_COOKIE = "proinfo_admin_session";
 const SESSION_MAX_AGE = 60 * 60 * 8;
 
+function shouldUseSecureCookie() {
+  const override = process.env.ADMIN_COOKIE_SECURE;
+  if (override === "true") return true;
+  if (override === "false") return false;
+
+  const appUrl = process.env.NEXTAUTH_URL || process.env.SITE_URL || "";
+  return appUrl.startsWith("https://");
+}
+
 function getSessionSecret() {
   return process.env.ADMIN_SESSION_SECRET || process.env.NEXT_ADMIN_TOKEN || "";
 }
@@ -104,7 +113,7 @@ export function applySessionCookie(response: NextResponse, session: AdminSession
     name: ADMIN_COOKIE,
     value: serializeSession(session),
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(),
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_MAX_AGE,
