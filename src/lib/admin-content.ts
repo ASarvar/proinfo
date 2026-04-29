@@ -1,5 +1,7 @@
 import { Language, prisma } from "./api-helpers";
 import { createEntityTranslations, getEntityTranslations } from "./api-helpers";
+import { unlink } from "fs/promises";
+import path from "path";
 
 export type AdminResource =
   | "categories"
@@ -75,7 +77,10 @@ export async function listAdminContent(resource: AdminResource, lang: Language =
           status: "published",
           publishedAt: row.createdAt,
           categorySlug: row.category.slug,
-          ...tr[lang],
+          title: tr[lang]?.title,
+          description: tr[lang]?.description,
+          content: tr[lang]?.content,  // raw JSON for admin table to parse
+          price: row.price,
           updatedAt: row.updatedAt,
         };
       })
@@ -171,6 +176,25 @@ export async function listAdminContent(resource: AdminResource, lang: Language =
   );
 }
 
+export async function getAdminContentById(resource: AdminResource, id: string, lang: Language = Language.RU) {
+  if (resource === "products") {
+    const row = await prisma.product.findUnique({ where: { id }, include: { category: true } });
+    if (!row) return null;
+    const tr = await getEntityTranslations("Product", row.id, [lang]);
+    return {
+      id: row.id,
+      slug: row.slug,
+      imageUrl: row.imageUrl,
+      categorySlug: row.category?.slug ?? null,
+      price: row.price,
+      title: tr[lang]?.title ?? null,
+      description: tr[lang]?.description ?? null,
+      content: tr[lang]?.content ?? null,
+    };
+  }
+  return null;
+}
+
 export async function createAdminContent(resource: AdminResource, payload: any) {
   const title = (payload?.title || "").trim();
   const slug = normalizeSlug(payload?.slug || title);
@@ -205,12 +229,33 @@ export async function createAdminContent(resource: AdminResource, payload: any) 
       data: {
         slug,
         categoryId: category.id,
-        imageUrl,
+        imageUrl: (Array.isArray(payload?.images) && payload.images[0]) ? String(payload.images[0]).trim() : (imageUrl || null),
         price: payload?.price ?? null,
       },
     });
 
-    await createEntityTranslations("Product", row.id, buildTranslations(title, description, content));
+    // Store extra product fields as JSON in Translation.content
+    const extras: Record<string, unknown> = {};
+    if (payload?.sku) extras.sku = String(payload.sku).trim();
+    if (payload?.stockQuantity != null) extras.quantity = Number(payload.stockQuantity);
+    if (Array.isArray(payload?.images) && payload.images.length > 0) extras.images = payload.images.filter(Boolean);
+    if (Array.isArray(payload?.tags) && payload.tags.length > 0) extras.tags = payload.tags;
+    if (Array.isArray(payload?.features) && payload.features.length > 0) extras.features = payload.features;
+    if (payload?.specifications && typeof payload.specifications === "object" && Object.keys(payload.specifications).length > 0) {
+      extras.specifications = payload.specifications;
+    }
+    if (payload?.videoUrl) extras.videoUrl = String(payload.videoUrl).trim();
+    if (payload?.brochureUrl) extras.brochureUrl = String(payload.brochureUrl).trim();
+    if (payload?.longDescription) extras.longDescription = String(payload.longDescription);
+
+    const extrasContent = Object.keys(extras).length > 0 ? JSON.stringify(extras) : content;
+
+    const translations: Record<Language, { title: string; description?: string | null; content?: string | null }> = {
+      [Language.RU]: { title, description, content: extrasContent },
+      [Language.UZ]: { title, description, content: extrasContent },
+      [Language.EN]: { title, description, content: extrasContent },
+    };
+    await createEntityTranslations("Product", row.id, translations);
     return { id: row.id, slug: row.slug };
   }
 
@@ -301,8 +346,59 @@ export async function updateAdminContent(resource: AdminResource, id: string, pa
   }
 
   if (resource === "products") {
-    if (imageUrl !== undefined) patch.imageUrl = imageUrl || null;
-    return prisma.product.update({ where: { id }, data: patch });
+    // Use images[0] as primary imageUrl if provided
+    const primaryImageUrl = Array.isArray(payload?.images) && payload.images[0]
+      ? String(payload.images[0]).trim()
+      : imageUrl;
+    if (primaryImageUrl !== undefined) patch.imageUrl = primaryImageUrl || null;
+    if (payload?.price != null) patch.price = Number(payload.price);
+
+    // Update category if categorySlug provided
+    if (payload?.categorySlug) {
+      const cat = await prisma.category.findUnique({ where: { slug: normalizeSlug(payload.categorySlug) } });
+      if (cat) patch.categoryId = cat.id;
+    }
+
+    await prisma.product.update({ where: { id }, data: patch });
+
+    // Rebuild extras JSON for Translation.content
+    const extras: Record<string, unknown> = {};
+    if (payload?.sku) extras.sku = String(payload.sku).trim();
+    if (payload?.stockQuantity != null) extras.quantity = Number(payload.stockQuantity);
+    if (Array.isArray(payload?.images) && payload.images.length > 0) extras.images = payload.images.filter(Boolean);
+    if (Array.isArray(payload?.tags) && payload.tags.length > 0) extras.tags = payload.tags;
+    if (Array.isArray(payload?.features) && payload.features.length > 0) extras.features = payload.features;
+    if (payload?.specifications && typeof payload.specifications === "object" && Object.keys(payload.specifications).length > 0) {
+      extras.specifications = payload.specifications;
+    }
+    if (payload?.videoUrl) extras.videoUrl = String(payload.videoUrl).trim();
+    if (payload?.brochureUrl) extras.brochureUrl = String(payload.brochureUrl).trim();
+    if (payload?.longDescription) extras.longDescription = String(payload.longDescription);
+    const extrasContent = Object.keys(extras).length > 0 ? JSON.stringify(extras) : null;
+
+    // Update translations for all languages (use findFirst+update/create — no composite unique on entityType+entityId+language)
+    const title = (payload?.title || "").trim();
+    const descriptionVal = (payload?.description || "").trim() || null;
+    if (title) {
+      for (const lang of [Language.RU, Language.UZ, Language.EN]) {
+        const existing = await prisma.translation.findFirst({
+          where: { entityType: "Product", entityId: id, language: lang },
+          select: { id: true },
+        });
+        if (existing) {
+          await prisma.translation.update({
+            where: { id: existing.id },
+            data: { title, description: descriptionVal, content: extrasContent },
+          });
+        } else {
+          await prisma.translation.create({
+            data: { entityType: "Product", entityId: id, language: lang, title, description: descriptionVal, content: extrasContent },
+          });
+        }
+      }
+    }
+
+    return prisma.product.findUnique({ where: { id } });
   }
 
   if (resource === "blog") {
@@ -331,7 +427,37 @@ export async function updateAdminContent(resource: AdminResource, id: string, pa
 
 export async function deleteAdminContent(resource: AdminResource, id: string) {
   if (resource === "categories") return prisma.category.delete({ where: { id } });
-  if (resource === "products") return prisma.product.delete({ where: { id } });
+  if (resource === "products") {
+    // Collect uploaded image URLs before deleting
+    const product = await prisma.product.findUnique({ where: { id } });
+    const translations = product
+      ? await prisma.translation.findMany({ where: { entityType: "Product", entityId: id }, select: { content: true } })
+      : [];
+    const imagesToDelete: string[] = [];
+    if (product?.imageUrl) imagesToDelete.push(product.imageUrl);
+    for (const tr of translations) {
+      try {
+        if (tr.content) {
+          const extras = JSON.parse(tr.content);
+          if (Array.isArray(extras.images)) {
+            for (const url of extras.images) {
+              if (url && !imagesToDelete.includes(url)) imagesToDelete.push(url);
+            }
+          }
+        }
+      } catch {}
+    }
+    const deleted = await prisma.product.delete({ where: { id } });
+    // Delete local files asynchronously (don't fail if file missing)
+    const uploadDir = path.join(process.cwd(), "public");
+    for (const url of imagesToDelete) {
+      if (typeof url === "string" && url.startsWith("/uploads/")) {
+        const filePath = path.join(uploadDir, url.replace(/\/uploads\//, "uploads/"));
+        unlink(filePath).catch(() => {});
+      }
+    }
+    return deleted;
+  }
   if (resource === "blog") return prisma.post.delete({ where: { id } });
   if (resource === "video") return prisma.video.delete({ where: { id } });
   if (resource === "photo") return prisma.photoAlbum.delete({ where: { id } });

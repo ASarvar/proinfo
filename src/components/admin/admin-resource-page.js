@@ -1,6 +1,33 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  adminAlertErrorStyle,
+  adminAlertSuccessStyle,
+  adminAmbientGlowSideStyle,
+  adminAmbientGlowTopStyle,
+  adminGroupBodyStyle,
+  adminGroupHeaderStyle,
+  adminHeroStyle,
+  adminHeroSubtitleStyle,
+  adminInputStyle,
+  adminLoadingTextStyle,
+  adminMetaLabelStyle,
+  adminMetaPillStyle,
+  adminMetaValueStyle,
+  adminPageShellStyle,
+  adminPageTitleStyle,
+  adminPrimaryCtaStyle,
+  adminSectionStyle,
+  adminSummaryTextStyle,
+  adminTableContainerStyle,
+  adminTableHeadRowStyle,
+  adminTableStyle,
+  adminTdStyle,
+  adminThStyle,
+  adminUploadLabelStyle,
+  adminHeroMetaWrapStyle,
+} from "./admin-ui-tokens";
 
 export default function AdminResourcePage({
   title,
@@ -144,14 +171,37 @@ export default function AdminResourcePage({
   };
 
   return (
-    <section style={{ fontFamily: "'Inter', sans-serif" }}>
-      <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 24, fontWeight: 700, color: "#03041C", letterSpacing: "-0.02em", margin: "0 0 6px" }}>{title}</h1>
-      <p style={{ marginBottom: 20, color: "#A3A3AA", fontSize: 14, margin: "0 0 20px" }}>
+    <section style={pageShellStyle}>
+      <div style={ambientGlowTopStyle} />
+      <div style={ambientGlowSideStyle} />
+
+      <div style={heroStyle}>
+        <div style={{ minWidth: 0 }}>
+          <h1 style={pageTitleStyle}>{title}</h1>
+          <p style={heroSubtitleStyle}>
+            {supportsPublishing ? "Draft / publish workflow enabled." : "Content management."}
+          </p>
+        </div>
+        <div style={heroStatsStyle}>
+          <div style={metaPillStyle}>
+            <span style={metaLabelStyle}>Items</span>
+            <strong style={metaValueStyle}>{items.length}</strong>
+          </div>
+          {supportsPublishing ? (
+            <div style={metaPillStyle}>
+              <span style={metaLabelStyle}>Workflow</span>
+              <strong style={metaValueStyle}>Draft/Live</strong>
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <p style={summaryTextStyle}>
         {supportsPublishing ? "Draft / publish workflow enabled." : "Content management."}
       </p>
 
-      <form onSubmit={onCreate} style={{ background: "#fff", border: "1px solid #EAEAF0", borderRadius: 12, padding: 20, marginBottom: 18 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
+      <form onSubmit={onCreate} style={formStyle}>
+        <div style={formGridStyle}>
           <input placeholder="Title" required value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} style={inputStyle} />
           <input placeholder="Slug" value={form.slug} onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))} style={inputStyle} />
           {requiresCategory ? (
@@ -176,7 +226,7 @@ export default function AdminResourcePage({
         </div>
 
         <div style={{ marginTop: 10, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <label style={{ border: "1.5px dashed #D5D5DF", borderRadius: 8, padding: "8px 14px", cursor: "pointer", background: "#F5F6F8", fontSize: 13, color: "#525258", fontWeight: 500 }}>
+          <label style={uploadLabelStyle}>
             {uploading ? "Uploading..." : "Upload file"}
             <input type="file" onChange={onUpload} style={{ display: "none" }} />
           </label>
@@ -185,20 +235,21 @@ export default function AdminResourcePage({
       </form>
 
       {message && (
-        <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 12, fontSize: 13, color: "#166534" }}>
+        <div style={alertSuccessStyle}>
           {message}
         </div>
       )}
       {error && (
-        <div style={{ background: "#FFF5F5", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 12, fontSize: 13, color: "#B91C1C" }}>
+        <div style={alertErrorStyle}>
           {error}
         </div>
       )}
 
-      <div style={{ marginTop: 14, background: "#fff", borderRadius: 12, border: "1px solid #EAEAF0", overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div style={tableWrapStyle}>
+        <div style={tableContainerStyle}>
+        <table style={tableStyle}>
           <thead>
-            <tr style={{ background: "#F5F6F8", textAlign: "left" }}>
+            <tr style={tableHeadRowStyle}>
               <th style={thStyle}>Title</th>
               <th style={thStyle}>Slug</th>
               <th style={thStyle}>Status</th>
@@ -220,7 +271,7 @@ export default function AdminResourcePage({
                   <td style={tdStyle}>{item.updatedAt ? new Date(item.updatedAt).toLocaleString() : "-"}</td>
                   <td style={tdStyle}>
                     {supportsPublishing ? (
-                      <div style={{ display: "flex", gap: 8 }}>
+                      <div style={actionGroupStyle}>
                         <button type="button" onClick={() => setPublishState(item.id, "draft")} style={smallButtonStyle}>Draft</button>
                         <button type="button" onClick={() => setPublishState(item.id, "published")} style={smallButtonStyle}>Publish</button>
                       </div>
@@ -233,60 +284,88 @@ export default function AdminResourcePage({
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </section>
   );
 }
 
-const inputStyle = {
-  background: "#EFF0F2",
-  border: "2px solid #EFF0F2",
-  borderRadius: 8,
-  padding: "10px 12px",
-  fontSize: 14,
-  color: "#03041C",
-  width: "100%",
-  boxSizing: "border-box",
-  fontFamily: "'Inter', sans-serif",
-  outline: "none",
+const pageShellStyle = adminPageShellStyle;
+
+const ambientGlowTopStyle = adminAmbientGlowTopStyle;
+
+const ambientGlowSideStyle = adminAmbientGlowSideStyle;
+
+const heroStyle = adminHeroStyle;
+
+const pageTitleStyle = {
+  ...adminPageTitleStyle,
+  margin: "0 0 6px",
 };
 
-const buttonStyle = {
-  border: "none",
-  background: "#03041C",
-  color: "#fff",
-  borderRadius: 8,
-  padding: "10px 16px",
-  fontSize: 14,
-  fontWeight: 600,
-  cursor: "pointer",
-  fontFamily: "'Space Grotesk', sans-serif",
-  letterSpacing: "-0.01em",
+const heroSubtitleStyle = adminHeroSubtitleStyle;
+
+const heroStatsStyle = adminHeroMetaWrapStyle;
+
+const summaryTextStyle = adminSummaryTextStyle;
+
+const formStyle = {
+  ...adminSectionStyle,
+  marginBottom: 18,
 };
+
+const formGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+  gap: 10,
+};
+
+const inputStyle = adminInputStyle;
+
+const uploadLabelStyle = adminUploadLabelStyle;
+
+const buttonStyle = adminPrimaryCtaStyle;
+
+const alertSuccessStyle = adminAlertSuccessStyle;
+
+const alertErrorStyle = adminAlertErrorStyle;
+
+const tableWrapStyle = {
+  ...adminGroupBodyStyle,
+  marginTop: 14,
+  borderTop: "1px solid #E6E9F2",
+  borderRadius: 14,
+};
+
+const tableContainerStyle = adminTableContainerStyle;
+
+const tableStyle = adminTableStyle;
+
+const tableHeadRowStyle = adminTableHeadRowStyle;
+
+const thStyle = adminThStyle;
+
+const tdStyle = adminTdStyle;
 
 const smallButtonStyle = {
-  border: "1px solid #EAEAF0",
-  background: "#F5F6F8",
-  color: "#03041C",
-  borderRadius: 6,
-  padding: "5px 10px",
-  fontSize: 12,
-  fontWeight: 600,
-  cursor: "pointer",
-  fontFamily: "'Inter', sans-serif",
-};
-
-const thStyle = {
-  padding: "11px 14px",
-  borderBottom: "1px solid #EAEAF0",
+  border: "1px solid #CCD5E6",
+  background: "#EEF2FF",
+  color: "#1F3A8A",
+  borderRadius: 8,
+  padding: "6px 10px",
   fontSize: 12,
   fontWeight: 700,
-  color: "#A3A3AA",
-  textTransform: "uppercase",
-  letterSpacing: "0.06em",
+  cursor: "pointer",
 };
 
-const tdStyle = {
-  padding: "11px 14px",
-  borderBottom: "1px solid #f1f5f9",
+const actionGroupStyle = {
+  display: "flex",
+  gap: 8,
+  flexWrap: "wrap",
 };
+
+const metaPillStyle = adminMetaPillStyle;
+
+const metaLabelStyle = adminMetaLabelStyle;
+
+const metaValueStyle = adminMetaValueStyle;

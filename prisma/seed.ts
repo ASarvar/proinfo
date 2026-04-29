@@ -19,14 +19,39 @@ async function main() {
   // SEED CATEGORIES
   // ============================================================================
 
+  // Delete old categories (and their linked products via cascade)
+  await prisma.product.deleteMany({});
+  await prisma.category.deleteMany({});
+  console.log("🗑️  Cleared old categories and products\n");
+
   const categoriesData = [
-    { slug: "rfid", titleRu: "RFID", titleUz: "RFID", titleEn: "RFID", descRu: "RFID технология", descUz: "RFID texnologiyasi", descEn: "RFID technology" },
-    { slug: "automation", titleRu: "Автоматизация", titleUz: "Avtomatika", titleEn: "Automation", descRu: "Системы автоматизации", descUz: "Avtomatika tizimlari", descEn: "Automation systems" },
-    { slug: "software", titleRu: "ПО", titleUz: "Dasturiy ta'minot", titleEn: "Software", descRu: "Программное обеспечение", descUz: "Dasturiy ta'minot", descEn: "Software" },
-    { slug: "equipment", titleRu: "Оборудование", titleUz: "Asboblar", titleEn: "Equipment", descRu: "Оборудование и приборы", descUz: "Asboblar va qurilmalar", descEn: "Equipment and devices" },
-    { slug: "interactive", titleRu: "Интерактивные", titleUz: "Interaktiv", titleEn: "Interactive", descRu: "Интерактивные системы", descUz: "Interaktiv tizimlar", descEn: "Interactive systems" },
-    { slug: "infrastructure", titleRu: "Инфраструктура", titleUz: "Infra-tuzilma", titleEn: "Infrastructure", descRu: "Инфраструктурные решения", descUz: "Infra-tuzilma yechimlari", descEn: "Infrastructure solutions" },
-    { slug: "innovation", titleRu: "Инновации", titleUz: "Innovatsiyalar", titleEn: "Innovation", descRu: "Инновационные решения", descUz: "Innovatsion echimlari", descEn: "Innovative solutions" },
+    // Библиотечный RFID
+    { slug: "library-rfid",          titleRu: "Библиотечный RFID",             titleUz: "Kutubxona RFID",              titleEn: "Library RFID",              descRu: "RFID решения для библиотек",          descUz: "Kutubxonalar uchun RFID yechimlari",   descEn: "RFID solutions for libraries" },
+    { slug: "rfid-tags-cards",        titleRu: "RFID метки и карты",             titleUz: "RFID teglar va kartalar",      titleEn: "RFID Tags & Cards",         descRu: "RFID метки и карты",                   descUz: "RFID teglar va kartalar",              descEn: "RFID tags and cards" },
+    { slug: "readers",                titleRu: "Считыватели",                    titleUz: "O'quvchilar",                  titleEn: "Readers",                   descRu: "RFID считыватели",                    descUz: "RFID o'quvchilari",                    descEn: "RFID readers" },
+    { slug: "security-systems",       titleRu: "Системы безопасности",           titleUz: "Xavfsizlik tizimlari",         titleEn: "Security Systems",          descRu: "Системы контроля доступа и безопасности", descUz: "Kirish nazorati va xavfsizlik tizimlari", descEn: "Access control and security systems" },
+    { slug: "self-service-terminals", titleRu: "Терминалы самообслуживания",     titleUz: "O'z-o'ziga xizmat terminallari", titleEn: "Self-Service Terminals",  descRu: "Терминалы самообслуживания",           descUz: "O'z-o'ziga xizmat terminallari",       descEn: "Self-service terminals" },
+    // Программное обеспечение
+    { slug: "software",               titleRu: "Программное обеспечение",        titleUz: "Dasturiy ta'minot",            titleEn: "Software",                  descRu: "Программные продукты",                descUz: "Dasturiy mahsulotlar",                 descEn: "Software products" },
+    { slug: "library-systems",        titleRu: "Библиотечные системы",           titleUz: "Kutubxona tizimlari",          titleEn: "Library Systems",           descRu: "Автоматизация библиотек",             descUz: "Kutubxonalarni avtomatlashtirish",      descEn: "Library automation systems" },
+    { slug: "microsoft-products",     titleRu: "Продукты Microsoft",             titleUz: "Microsoft mahsulotlari",       titleEn: "Microsoft Products",        descRu: "Лицензионные продукты Microsoft",     descUz: "Litsenziyalangan Microsoft mahsulotlari", descEn: "Licensed Microsoft products" },
+    // Распознавание лиц
+    { slug: "face-recognition",       titleRu: "Распознавание лиц",             titleUz: "Yuz tanish",                  titleEn: "Face Recognition",          descRu: "Биометрическое распознавание лиц",    descUz: "Biometrik yuz tanish",                 descEn: "Biometric face recognition" },
+    // Интерактивные панели и киоски
+    { slug: "interactive-panels-kiosks", titleRu: "Интерактивные панели и киоски", titleUz: "Interaktiv panellar va kiosklar", titleEn: "Interactive Panels & Kiosks", descRu: "Интерактивные решения", descUz: "Interaktiv yechimlar", descEn: "Interactive solutions" },
+    { slug: "infokiosks",             titleRu: "Инфокиоски",                    titleUz: "Infokiosklar",                 titleEn: "Info Kiosks",               descRu: "Информационные киоски",               descUz: "Axborot kiosklari",                    descEn: "Information kiosks" },
+    { slug: "touch-panels",           titleRu: "Сенсорные панели",              titleUz: "Sensorli panellar",            titleEn: "Touch Panels",              descRu: "Сенсорные панели",                    descUz: "Sensorli panellar",                    descEn: "Touch panels" },
+    // Мебель и инфраструктура
+    { slug: "furniture-infrastructure", titleRu: "Мебель и инфраструктура",     titleUz: "Mebel va infratuzilma",        titleEn: "Furniture & Infrastructure", descRu: "Специализированная мебель",          descUz: "Ixtisoslashtirilgan mebel",            descEn: "Specialized furniture and infrastructure" },
+    // Инновационные решения
+    { slug: "innovative-solutions",   titleRu: "Инновационные решения",         titleUz: "Innovatsion yechimlar",        titleEn: "Innovative Solutions",      descRu: "Инновационные технологии",            descUz: "Innovatsion texnologiyalar",           descEn: "Innovative technologies" },
+    // Принтеры
+    { slug: "printers",               titleRu: "Принтеры",                      titleUz: "Printerlar",                  titleEn: "Printers",                  descRu: "Принтеры различных типов",            descUz: "Turli xil printerlar",                 descEn: "Various types of printers" },
+    { slug: "card-printers",          titleRu: "Карт-принтеры",                 titleUz: "Karta printerlari",            titleEn: "Card Printers",             descRu: "Принтеры для печати карт",            descUz: "Karta bosib chiqarish printerlari",    descEn: "Card printing printers" },
+    { slug: "thermal-printers",       titleRu: "Термопринтеры",                 titleUz: "Termal printerlar",            titleEn: "Thermal Printers",          descRu: "Термопринтеры",                       descUz: "Termal printerlar",                    descEn: "Thermal printers" },
+    // Коммерческий RFID
+    { slug: "commercial-rfid",        titleRu: "Коммерческий RFID",             titleUz: "Tijorat RFID",                titleEn: "Commercial RFID",           descRu: "RFID решения для бизнеса",            descUz: "Biznes uchun RFID yechimlari",         descEn: "RFID solutions for business" },
+    { slug: "fixed-assets-inventory", titleRu: "Инвентаризация основных средств", titleUz: "Asosiy vositalar inventarizatsiyasi", titleEn: "Fixed Assets Inventory", descRu: "Учёт и инвентаризация основных средств", descUz: "Asosiy vositalar hisobi va inventarizatsiyasi", descEn: "Fixed assets accounting and inventory" },
   ];
 
   const categories = await Promise.all(
@@ -67,73 +92,6 @@ async function main() {
   );
 
   console.log(`✅ Created ${categories.length} categories with translations\n`);
-
-  // ============================================================================
-  // SEED PRODUCTS
-  // ============================================================================
-
-  const productsData = [
-    { categorySlug: "rfid", slug: "product-1", titleRu: "RFID Читатель", price: 4500 },
-    { categorySlug: "rfid", slug: "product-2", titleRu: "RFID Метка", price: 150 },
-    { categorySlug: "automation", slug: "product-3", titleRu: "PLC Контроллер", price: 8900 },
-    { categorySlug: "automation", slug: "product-4", titleRu: "Датчик движения", price: 350 },
-    { categorySlug: "software", slug: "product-5", titleRu: "ERP система", price: 25000 },
-    { categorySlug: "software", slug: "product-6", titleRu: "CRM платформа", price: 15000 },
-    { categorySlug: "equipment", slug: "product-7", titleRu: "Сканер штрих-кодов", price: 2500 },
-    { categorySlug: "equipment", slug: "product-8", titleRu: "Весы электронные", price: 3200 },
-    { categorySlug: "interactive", slug: "product-9", titleRu: "Интерактивная доска", price: 12000 },
-    { categorySlug: "interactive", slug: "product-10", titleRu: "Сенсорный киоск", price: 18500 },
-    { categorySlug: "infrastructure", slug: "product-11", titleRu: "Облачный сервер", price: 5000 },
-    { categorySlug: "infrastructure", slug: "product-12", titleRu: "Network Router", price: 4200 },
-    { categorySlug: "innovation", slug: "product-13", titleRu: "IoT платформа", price: 35000 },
-    { categorySlug: "innovation", slug: "product-14", titleRu: "AI решение", price: 50000 },
-    { categorySlug: "rfid", slug: "product-15", titleRu: "RFID Принтер", price: 9800 },
-    { categorySlug: "automation", slug: "product-16", titleRu: "Smart Controller", price: 7500 },
-  ];
-
-  const products = await Promise.all(
-    productsData.map(async (prod) => {
-      const category = categories.find((c) => c.slug === prod.categorySlug);
-      if (!category) return null;
-
-      const product = await prisma.product.upsert({
-        where: { slug: prod.slug },
-        update: {},
-        create: {
-          slug: prod.slug,
-          categoryId: category.id,
-          imageUrl: `/assets/img/product/${prod.slug}.jpg`,
-          price: prod.price,
-          order: productsData.indexOf(prod),
-        },
-      });
-
-      // Create translations
-      for (const lang of Object.values(Language)) {
-        await prisma.translation.upsert({
-          where: {
-            language_productId: {
-              productId: product.id,
-              language: lang,
-            },
-          },
-          update: {},
-          create: {
-            language: lang,
-            entityType: "Product",
-            entityId: product.id,
-            title: prod.titleRu,
-            description: `${prod.titleRu} - Цена: ${prod.price}`,
-            productId: product.id,
-          },
-        });
-      }
-
-      return product;
-    })
-  );
-
-  console.log(`✅ Created ${products.filter((p) => p).length} products with translations\n`);
 
   // ============================================================================
   // SEED DIRECTIONS
@@ -461,7 +419,6 @@ async function main() {
   console.log(
     `Summary:\n` +
       `  • ${categories.length} Categories\n` +
-      `  • ${products.filter((p) => p).length} Products\n` +
       `  • ${directions.length} Directions\n` +
       `  • ${posts.length} Blog Posts\n` +
       `  • ${videos.length} Videos\n` +

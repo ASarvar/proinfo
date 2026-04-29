@@ -38,13 +38,19 @@ export async function GET(request: NextRequest) {
     const enriched = await Promise.all(
       products.map(async (prod) => {
         const translations = await getEntityTranslations("Product", prod.id, [lang]);
+        const rawTr = translations[lang] || {};
+        let extras: Record<string, unknown> = {};
+        try { if (rawTr.content) extras = JSON.parse(rawTr.content as string); } catch {}
         return {
           id: prod.id,
           slug: prod.slug,
           categorySlug: prod.category.slug,
           imageUrl: prod.imageUrl,
           price: prod.price,
-          ...translations[lang],
+          title: rawTr.title,
+          description: rawTr.description,
+          content: rawTr.content, // keep raw for admin table
+          ...extras,
           createdAt: prod.createdAt,
           updatedAt: prod.updatedAt,
         };

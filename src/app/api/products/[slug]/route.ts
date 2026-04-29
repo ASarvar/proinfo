@@ -26,6 +26,17 @@ export async function GET(
     }
 
     const translations = await getEntityTranslations("Product", product.id, [lang]);
+    const rawTranslation = translations[lang] || {};
+
+    // Parse extra fields stored as JSON in content
+    let extras: Record<string, unknown> = {};
+    if (rawTranslation.content) {
+      try {
+        extras = JSON.parse(rawTranslation.content);
+      } catch {
+        // content is plain text, not JSON extras — keep it as-is
+      }
+    }
 
     const result = {
       id: product.id,
@@ -34,7 +45,10 @@ export async function GET(
       categorySlug: product.category.slug,
       imageUrl: product.imageUrl,
       price: product.price,
-      ...translations[lang],
+      title: rawTranslation.title,
+      description: rawTranslation.description,
+      // Spread extras (sku, quantity, tags, features, specifications, videoUrl, brochureUrl)
+      ...extras,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     };

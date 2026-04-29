@@ -2,10 +2,25 @@ import { cookies } from "next/headers";
 import { parseSession } from "@lib/admin-auth";
 import { prisma } from "@lib/api-helpers";
 import Link from "next/link";
+import {
+  adminGroupBodyStyle,
+  adminGroupCardStyle,
+  adminHeroStyle,
+  adminHeroMetaWrapStyle,
+  adminHeroSubtitleStyle,
+  adminMetaLabelStyle,
+  adminMetaPillStyle,
+  adminMetaValueStyle,
+  adminPageShellStyle,
+  adminPageTitleStyle,
+  adminSectionStyle,
+  adminStatusDraftStyle,
+  adminStatusPublishedStyle,
+} from "@components/admin/admin-ui-tokens";
 
 // ── Tiny SVG icons ──────────────────────────────────────────────
-const IconBox = ({ bg, icon, bgClass }) => (
-  <span className={bgClass || "admin-dashboard__stats__card__icon-box"} style={{ background: bg }}>{icon}</span>
+const IconBox = ({ bg, icon }) => (
+  <span style={{ ...statIconBoxStyle, background: bg }}>{icon}</span>
 );
 
 const icons = {
@@ -56,22 +71,11 @@ const icons = {
   ),
 };
 
-const navIcons = {
-  Dashboard: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>,
-  Categories: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>,
-  Products: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>,
-  Blog: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
-  Video: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>,
-  Photo: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
-  Download: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
-  FAQ: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-};
-
 // ── Status badge ─────────────────────────────────────────────────
 const StatusBadge = ({ status }) => {
   const published = status === "published";
   return (
-    <span className={`status-badge status-badge--${published ? "published" : "draft"}`}>
+    <span style={published ? adminStatusPublishedStyle : adminStatusDraftStyle}>
       {published ? "Published" : "Draft"}
     </span>
   );
@@ -115,67 +119,83 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="admin-dashboard">
+    <div style={pageStyle}>
 
       {/* ── Header ── */}
-      <div className="admin-dashboard__header">
-        <h1 className="admin-dashboard__header__title">
+      <div style={heroStyle}>
+        <div style={{ minWidth: 0 }}>
+        <h1 style={heroTitleStyle}>
           Welcome back, {session?.username} 👋
         </h1>
-        <p className="admin-dashboard__header__subtitle">
+        <p style={heroSubtitleStyle}>
           {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           {" · "}<span>{session?.role}</span>
         </p>
+        </div>
+        <div style={heroMetaWrapStyle}>
+          <div style={metaPillStyle}>
+            <span style={metaLabelStyle}>Products</span>
+            <strong style={metaValueStyle}>{productCount}</strong>
+          </div>
+          <div style={metaPillStyle}>
+            <span style={metaLabelStyle}>Posts</span>
+            <strong style={metaValueStyle}>{postCount}</strong>
+          </div>
+          <div style={metaPillStyle}>
+            <span style={metaLabelStyle}>Media</span>
+            <strong style={metaValueStyle}>{videoCount + photoCount + downloadCount}</strong>
+          </div>
+        </div>
       </div>
 
       {/* ── Stat Cards ── */}
-      <div className="admin-dashboard__stats">
+      <div style={statsGridStyle}>
         {STATS.map((s) => (
-          <Link key={s.title} href={s.href} className="admin-dashboard__stats__card">
+          <Link key={s.title} href={s.href} style={statCardStyle}>
             <IconBox bg={s.bg} icon={s.icon} />
-            <div className="admin-dashboard__stats__card__content">
-              <div className="admin-dashboard__stats__card__label">
+            <div style={statContentStyle}>
+              <div style={statLabelStyle}>
                 {s.title}
               </div>
-              <div className="admin-dashboard__stats__card__value">
+              <div style={statValueStyle}>
                 {s.value}
               </div>
-              {s.sub && <div className="admin-dashboard__stats__card__sub">{s.sub}</div>}
+              {s.sub && <div style={statSubStyle}>{s.sub}</div>}
             </div>
-            <span className="admin-dashboard__stats__card__arrow">{icons.arrow}</span>
+            <span style={statArrowStyle}>{icons.arrow}</span>
           </Link>
         ))}
       </div>
 
       {/* ── Two-column section ── */}
-      <div className="admin-dashboard__grid">
+      <div style={twoColumnGridStyle}>
 
         {/* Recent Products */}
-        <div className="admin-dashboard__card">
-          <div className="admin-dashboard__card__header">
-            <span className="admin-dashboard__card__title">
+        <div style={contentCardStyle}>
+          <div style={contentCardHeaderStyle}>
+            <span style={contentCardTitleStyle}>
               Recent Products
             </span>
-            <Link href="/admin/products" className="admin-dashboard__card__link">View all →</Link>
+            <Link href="/admin/products" style={contentCardLinkStyle}>View all →</Link>
           </div>
           <div>
             {recentProducts.length === 0 && (
-              <div className="admin-dashboard__card__empty">No products yet.</div>
+              <div style={emptyCardStyle}>No products yet.</div>
             )}
             {recentProducts.map((p, i) => (
-              <div key={p.id} className={`admin-dashboard__card__item ${i < recentProducts.length - 1 ? '' : 'admin-dashboard__card__item--last'}`}>
+              <div key={p.id} style={{ ...cardItemStyle, ...(i < recentProducts.length - 1 ? null : cardItemLastStyle) }}>
                 {p.imageUrl ? (
-                  <img src={p.imageUrl} alt="" width={36} height={36} className="admin-dashboard__card__item__image" />
+                  <img src={p.imageUrl} alt="" width={36} height={36} style={cardItemImageStyle} />
                 ) : (
-                  <div className="admin-dashboard__card__item__placeholder" />
+                  <div style={cardItemPlaceholderStyle} />
                 )}
-                <div className="admin-dashboard__card__item__content">
-                  <div className="admin-dashboard__card__item__name">
+                <div style={cardItemContentStyle}>
+                  <div style={cardItemNameStyle}>
                     {p.slug}
                   </div>
-                  <div className="admin-dashboard__card__item__category">{p.category?.slug}</div>
+                  <div style={cardItemMetaStyle}>{p.category?.slug}</div>
                 </div>
-                <div className="admin-dashboard__card__item__date">
+                <div style={cardItemDateStyle}>
                   {new Date(p.updatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                 </div>
               </div>
@@ -184,33 +204,33 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Recent Blog Posts */}
-        <div className="admin-dashboard__card">
-          <div className="admin-dashboard__card__header">
-            <span className="admin-dashboard__card__title">
+        <div style={contentCardStyle}>
+          <div style={contentCardHeaderStyle}>
+            <span style={contentCardTitleStyle}>
               Recent Blog Posts
             </span>
-            <Link href="/admin/blog" className="admin-dashboard__card__link">View all →</Link>
+            <Link href="/admin/blog" style={contentCardLinkStyle}>View all →</Link>
           </div>
           <div>
             {recentPosts.length === 0 && (
-              <div className="admin-dashboard__card__empty">No posts yet.</div>
+              <div style={emptyCardStyle}>No posts yet.</div>
             )}
             {recentPosts.map((p, i) => (
-              <div key={p.id} className={`admin-dashboard__card__item ${i < recentPosts.length - 1 ? '' : 'admin-dashboard__card__item--last'}`}>
+              <div key={p.id} style={{ ...cardItemStyle, ...(i < recentPosts.length - 1 ? null : cardItemLastStyle) }}>
                 {p.coverImageUrl ? (
-                  <img src={p.coverImageUrl} alt="" width={36} height={36} className="admin-dashboard__card__item__image" />
+                  <img src={p.coverImageUrl} alt="" width={36} height={36} style={cardItemImageStyle} />
                 ) : (
-                  <div className="admin-dashboard__card__item__placeholder" />
+                  <div style={cardItemPlaceholderStyle} />
                 )}
-                <div className="admin-dashboard__card__item__content">
-                  <div className="admin-dashboard__card__item__name">
+                <div style={cardItemContentStyle}>
+                  <div style={cardItemNameStyle}>
                     {p.slug}
                   </div>
-                  <div className="admin-dashboard__card__item__status">
+                  <div style={cardItemMetaStyle}>
                     <StatusBadge status={p.publishedAt ? "published" : "draft"} />
                   </div>
                 </div>
-                <div className="admin-dashboard__card__item__date">
+                <div style={cardItemDateStyle}>
                   {new Date(p.updatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                 </div>
               </div>
@@ -220,11 +240,11 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* ── Content Breakdown ── */}
-      <div className="admin-dashboard__overview">
-        <div className="admin-dashboard__overview__title">
+      <div style={overviewWrapStyle}>
+        <div style={overviewTitleStyle}>
           Content Overview
         </div>
-        <div className="admin-dashboard__overview__grid">
+        <div style={overviewGridStyle}>
           {[
             { label: "Blog Posts", count: postCount, href: "/admin/blog" },
             { label: "Videos", count: videoCount, href: "/admin/video" },
@@ -233,11 +253,11 @@ export default async function AdminDashboardPage() {
             { label: "FAQ Items", count: faqCount, href: "/admin/faq" },
             { label: "Categories", count: categoryCount, href: "/admin/categories" },
           ].map((item) => (
-            <Link key={item.label} href={item.href} className="admin-dashboard__overview__tile">
-              <div className="admin-dashboard__overview__tile__count">
+            <Link key={item.label} href={item.href} style={overviewTileStyle}>
+              <div style={overviewTileCountStyle}>
                 {item.count}
               </div>
-              <div className="admin-dashboard__overview__tile__label">{item.label}</div>
+              <div style={overviewTileLabelStyle}>{item.label}</div>
             </Link>
           ))}
         </div>
@@ -246,3 +266,200 @@ export default async function AdminDashboardPage() {
     </div>
   );
 }
+
+const pageStyle = {
+  ...adminPageShellStyle,
+  padding: "12px 0 6px",
+};
+
+const heroStyle = {
+  ...adminHeroStyle,
+  marginBottom: 18,
+};
+
+const heroTitleStyle = {
+  ...adminPageTitleStyle,
+  margin: "0 0 6px",
+};
+
+const heroSubtitleStyle = adminHeroSubtitleStyle;
+
+const heroMetaWrapStyle = adminHeroMetaWrapStyle;
+
+const metaPillStyle = adminMetaPillStyle;
+const metaLabelStyle = adminMetaLabelStyle;
+const metaValueStyle = adminMetaValueStyle;
+
+const statsGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+  gap: 14,
+  marginBottom: 18,
+};
+
+const statCardStyle = {
+  ...adminSectionStyle,
+  textDecoration: "none",
+  display: "flex",
+  alignItems: "center",
+  gap: 14,
+  minWidth: 0,
+};
+
+const statIconBoxStyle = {
+  width: 52,
+  height: 52,
+  borderRadius: 16,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+  boxShadow: "0 12px 22px rgba(226,102,102,0.18)",
+};
+
+const statContentStyle = { minWidth: 0, flex: 1 };
+const statLabelStyle = {
+  fontSize: 11,
+  fontWeight: 700,
+  color: "#6A7188",
+  textTransform: "uppercase",
+  letterSpacing: "0.1em",
+  marginBottom: 4,
+};
+const statValueStyle = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontSize: 28,
+  fontWeight: 700,
+  color: "#03041C",
+  letterSpacing: "-0.03em",
+};
+const statSubStyle = { fontSize: 13, color: "#667085", marginTop: 2 };
+const statArrowStyle = { color: "#98A2B3", flexShrink: 0 };
+
+const twoColumnGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+  gap: 16,
+  marginBottom: 18,
+};
+
+const contentCardStyle = adminGroupBodyStyle;
+
+const contentCardHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+  padding: "18px 20px 10px",
+};
+
+const contentCardTitleStyle = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontSize: 18,
+  fontWeight: 700,
+  color: "#03041C",
+  letterSpacing: "-0.02em",
+};
+
+const contentCardLinkStyle = {
+  color: "#1D4ED8",
+  textDecoration: "none",
+  fontSize: 13,
+  fontWeight: 700,
+};
+
+const emptyCardStyle = {
+  padding: "4px 20px 20px",
+  color: "#667085",
+  fontSize: 14,
+};
+
+const cardItemStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  padding: "14px 20px",
+  borderBottom: "1px solid #F0F2F7",
+};
+
+const cardItemLastStyle = { borderBottom: "none" };
+const cardItemImageStyle = {
+  width: 36,
+  height: 36,
+  borderRadius: 10,
+  objectFit: "cover",
+  flexShrink: 0,
+};
+const cardItemPlaceholderStyle = {
+  width: 36,
+  height: 36,
+  borderRadius: 10,
+  background: "linear-gradient(145deg, #F3F5FA 0%, #ECEFF7 100%)",
+  border: "1px dashed #CDD5E6",
+  flexShrink: 0,
+};
+const cardItemContentStyle = { minWidth: 0, flex: 1 };
+const cardItemNameStyle = {
+  fontSize: 14,
+  fontWeight: 700,
+  color: "#101828",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
+const cardItemMetaStyle = { fontSize: 12, color: "#667085", marginTop: 4 };
+const cardItemDateStyle = {
+  fontSize: 12,
+  color: "#98A2B3",
+  fontWeight: 700,
+  flexShrink: 0,
+};
+
+const overviewWrapStyle = {
+  ...adminGroupCardStyle,
+  ...adminGroupBodyStyle,
+  padding: "18px 20px 20px",
+};
+
+const overviewTitleStyle = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontSize: 18,
+  fontWeight: 700,
+  color: "#03041C",
+  letterSpacing: "-0.02em",
+  marginBottom: 14,
+};
+
+const overviewGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+  gap: 12,
+};
+
+const overviewTileStyle = {
+  textDecoration: "none",
+  background: "#F8FAFD",
+  border: "1px solid #E6E9F2",
+  borderRadius: 14,
+  padding: "16px 14px",
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+
+const overviewTileCountStyle = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontSize: 26,
+  fontWeight: 700,
+  color: "#03041C",
+  letterSpacing: "-0.03em",
+};
+
+const overviewTileLabelStyle = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: "#667085",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+};
+

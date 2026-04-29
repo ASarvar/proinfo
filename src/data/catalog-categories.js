@@ -1,41 +1,51 @@
 import products from "@data/products";
 
 export const categoryGroups = [
-  { key: "rfid", name: "RFID решения" },
-  { key: "automation", name: "Автоматизация библиотек" },
+  { key: "library-rfid", name: "Библиотечный RFID" },
   { key: "software", name: "Программное обеспечение" },
-  { key: "equipment", name: "Оборудование" },
-  { key: "interactive", name: "Интерактивные системы" },
+  { key: "face-recognition", name: "Распознавание лиц" },
+  { key: "interactive", name: "Интерактивные панели и киоски" },
   { key: "infrastructure", name: "Мебель и инфраструктура" },
   { key: "innovation", name: "Инновационные решения" },
+  { key: "printers", name: "Принтеры" },
+  { key: "commercial-rfid", name: "Коммерческий RFID" },
 ];
 
 const seedCategories = [
-  { slug: "rfid-tags-cards", name: "RFID метки и карты", groupKey: "rfid" },
-  { slug: "readers", name: "Считыватели", groupKey: "rfid" },
-  { slug: "anti-theft-systems", name: "Антикражные системы", groupKey: "rfid" },
+  // Библиотечный RFID
+  { slug: "library-rfid", name: "Библиотечный RFID", groupKey: "library-rfid" },
+  { slug: "rfid-tags-cards", name: "RFID метки и карты", groupKey: "library-rfid", parentSlug: "library-rfid" },
+  { slug: "readers", name: "Считыватели", groupKey: "library-rfid", parentSlug: "library-rfid" },
+  { slug: "security-systems", name: "Системы безопасности", groupKey: "library-rfid", parentSlug: "library-rfid" },
+  { slug: "self-service-terminals", name: "Терминалы самообслуживания", groupKey: "library-rfid", parentSlug: "library-rfid" },
 
-  { slug: "issue-stations", name: "Станции выдачи", groupKey: "automation" },
-  { slug: "return-stations", name: "Станции возврата", groupKey: "automation" },
-  { slug: "reservation-stations", name: "Станции бронирования", groupKey: "automation" },
+  // Программное обеспечение
+  { slug: "software", name: "Программное обеспечение", groupKey: "software" },
+  { slug: "library-systems", name: "Библиотечные системы", groupKey: "software", parentSlug: "software" },
+  { slug: "microsoft-products", name: "Продукты Microsoft", groupKey: "software", parentSlug: "software" },
 
-  { slug: "information-systems", name: "Информационные системы", groupKey: "software" },
-  { slug: "microsoft", name: "Microsoft", groupKey: "software" },
+  // Распознавание лиц
+  { slug: "face-recognition", name: "Распознавание лиц", groupKey: "face-recognition" },
 
-  { slug: "printers", name: "Принтеры", groupKey: "equipment" },
-  { slug: "consumables", name: "Расходники", groupKey: "equipment" },
-  { slug: "computers", name: "Компьютеры", groupKey: "equipment" },
-  { slug: "tablets", name: "Планшеты", groupKey: "equipment" },
+  // Интерактивные панели и киоски
+  { slug: "interactive-panels-kiosks", name: "Интерактивные панели и киоски", groupKey: "interactive" },
+  { slug: "infokiosks", name: "Инфокиоски", groupKey: "interactive", parentSlug: "interactive-panels-kiosks" },
+  { slug: "touch-panels", name: "Сенсорные панели", groupKey: "interactive", parentSlug: "interactive-panels-kiosks" },
 
-  { slug: "infokiosks", name: "Инфокиоски", groupKey: "interactive" },
-  { slug: "touch-panels", name: "Сенсорные панели", groupKey: "interactive" },
+  // Мебель и инфраструктура
+  { slug: "furniture-infrastructure", name: "Мебель и инфраструктура", groupKey: "infrastructure" },
 
-  { slug: "shelving", name: "Стеллажи", groupKey: "infrastructure" },
-  { slug: "wardrobe", name: "Гардероб", groupKey: "infrastructure" },
+  // Инновационные решения
+  { slug: "innovative-solutions", name: "Инновационные решения", groupKey: "innovation" },
 
-  { slug: "recognition", name: "Распознавание", groupKey: "innovation" },
-  { slug: "vending", name: "Вендинг", groupKey: "innovation" },
-  { slug: "sterilizers", name: "Стерилизаторы", groupKey: "innovation" },
+  // Принтеры
+  { slug: "printers", name: "Принтеры", groupKey: "printers" },
+  { slug: "card-printers", name: "Карт-принтеры", groupKey: "printers", parentSlug: "printers" },
+  { slug: "thermal-printers", name: "Термопринтеры", groupKey: "printers", parentSlug: "printers" },
+
+  // Коммерческий RFID
+  { slug: "commercial-rfid", name: "Коммерческий RFID", groupKey: "commercial-rfid" },
+  { slug: "fixed-assets-inventory", name: "Инвентаризация основных средств", groupKey: "commercial-rfid", parentSlug: "commercial-rfid" },
 ];
 
 const groupKeySet = new Set(categoryGroups.map((group) => group.key));

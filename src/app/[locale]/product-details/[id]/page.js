@@ -7,8 +7,8 @@ export const metadata = {
 };
 
 const ProductDetailsPage = async ({ params }) => {
-  const { id } = await params;
-  return <ShopDetailsMainArea id={id} />;
+  const { id, locale } = await params;
+  return <ShopDetailsMainArea id={id} locale={locale} />;
 };
 
 export default ProductDetailsPage;

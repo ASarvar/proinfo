@@ -1,10 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   deleteAdminContent,
+  getAdminContentById,
   isAdminResource,
   updateAdminContent,
 } from "@lib/admin-content";
 import { requireAdminSession } from "@lib/admin-auth";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ resource: string; id: string }> }
+) {
+  const { resource, id } = await params;
+
+  if (!isAdminResource(resource)) {
+    return NextResponse.json({ success: false, error: "Unknown admin resource" }, { status: 404 });
+  }
+
+  const { error } = requireAdminSession(request);
+  if (error) return error;
+
+  try {
+    const item = await getAdminContentById(resource, id);
+    if (!item) return NextResponse.json({ success: false, error: "Not found" }, { status: 404 });
+    return NextResponse.json({ success: true, data: item });
+  } catch (e: any) {
+    return NextResponse.json({ success: false, error: e?.message || "Failed to fetch item" }, { status: 500 });
+  }
+}
 
 export async function PATCH(
   request: NextRequest,

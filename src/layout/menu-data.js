@@ -4,42 +4,37 @@ import { getProductsByCategorySlug } from "@utils/catalog-map";
 
 const buildProductMegaCatalog = (t, locale) => {
   const mainCategories = getCategoryGroups().map((group) => {
-    const subcategories = group.categories.flatMap((category) => {
-      const baseProducts = getProductsByCategorySlug(productsData, category.slug);
-      const children = category.children || [];
+    // Each group maps to exactly one top-level category
+    const topCat = group.categories[0];
+    if (!topCat) return null;
 
-      const childSubcategories = children.map((child) => {
-        const childProducts = getProductsByCategorySlug(productsData, child.slug);
-        return {
+    const children = topCat.children || [];
+
+    // Subcategories = children of the top-level category.
+    // For standalone categories (no children), use the top-level itself as the only entry.
+    const subcategories = children.length > 0
+      ? children.map((child) => ({
           slug: child.slug,
           title: child.name,
           link: `/${locale}/category/${child.slug}/products`,
-          products: childProducts.length > 0 ? childProducts : baseProducts,
-        };
-      });
-
-      return [
-        {
-          slug: category.slug,
-          title: category.name,
-          link: `/${locale}/category/${category.slug}/products`,
-          products: baseProducts,
-        },
-        ...childSubcategories,
-      ];
-    });
+          products: getProductsByCategorySlug(productsData, child.slug),
+        }))
+      : [{
+          slug: topCat.slug,
+          title: topCat.name,
+          link: `/${locale}/category/${topCat.slug}/products`,
+          products: getProductsByCategorySlug(productsData, topCat.slug),
+        }];
 
     return {
       slug: group.key,
       title: group.name,
-      link: `/${locale}/category`,
+      link: `/${locale}/category/${topCat.slug}`,
       subcategories,
     };
-  });
+  }).filter(Boolean);
 
-  return {
-    mainCategories,
-  };
+  return { mainCategories };
 };
 
 const getMenuData = (t, locale) => [
@@ -50,20 +45,19 @@ const getMenuData = (t, locale) => [
     megaMenu: true,
     hasDropdown: true,
     megaCatalog: buildProductMegaCatalog(t, locale),
-    submenus: getCategoryGroups().map((group) => ({
-      title: group.name,
-      link: `/${locale}/category`,
-      hasDropdown: true,
-      submenus: group.categories.map((category) => ({
-        title: category.name,
-        link: `/${locale}/category/${category.slug}/products`,
-        hasDropdown: category.children.length > 0,
-        submenus: category.children.map((child) => ({
+    submenus: getCategoryGroups().map((group) => {
+      const topCat = group.categories[0];
+      const children = topCat?.children || [];
+      return {
+        title: group.name,
+        link: `/${locale}/category/${topCat?.slug || ""}`,
+        hasDropdown: children.length > 0,
+        submenus: children.map((child) => ({
           title: child.name,
           link: `/${locale}/category/${child.slug}/products`,
         })),
-      })),
-    })),
+      };
+    }),
   },
   {
     id: 2,
