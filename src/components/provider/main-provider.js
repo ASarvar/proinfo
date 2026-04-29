@@ -8,7 +8,8 @@ if (typeof window !== "undefined") {
 }
 
 // stripePromise
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_KEY;
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 export default function MainProvider({ children }) {
   return (
