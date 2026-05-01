@@ -186,12 +186,14 @@ const ProductDetailsArea = ({ product }) => {
 
               <div className="product__details-tab-content">
                 {activeTab === "description" && (
-                  <div className="product__details-tab-pane">
+                  <div className="product__details-tab-pane" style={{ wordBreak: "normal", overflowWrap: "break-word", hyphens: "none" }}>
                     {longDescription ? (
                       <div
                         className="product__details-rich-text"
-                        dangerouslySetInnerHTML={{ __html: longDescription }}
-                      />
+                        style={{ wordBreak: "normal", overflowWrap: "break-word", hyphens: "none", whiteSpace: "pre-wrap" }}
+                      >
+                        {longDescription.replace(/\u00AD/g, '')}
+                      </div>
                     ) : (
                       <>
                         <p>{description}</p>
@@ -208,7 +210,7 @@ const ProductDetailsArea = ({ product }) => {
                 )}
 
                 {activeTab === "specification" && (
-                  <div className="product__details-tab-pane">
+                  <div className="product__details-tab-pane" style={{ wordBreak: "normal", overflowWrap: "break-word" }}>
                     {specifications && Object.keys(specifications).length > 0 ? (
                       <table className="product__details-spec-table">
                         <tbody>

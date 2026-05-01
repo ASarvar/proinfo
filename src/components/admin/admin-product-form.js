@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import { categoryGroups, getCategoryBySlug } from "@data/catalog-categories";
+import { getCategoryGroups } from "@data/catalog-categories";
 import {
   adminAlertErrorStyle,
   adminAlertSuccessStyle,
@@ -11,11 +10,13 @@ import {
   adminAmbientGlowTopStyle,
   adminHeroStyle,
   adminHeroSubtitleStyle,
+  adminHeroMetaWrapStyle,
   adminHintStyle,
   adminImageGridStyle,
   adminInputStyle,
   adminLabelStyle,
   adminMetaLabelStyle,
+  adminMetaPillStyle,
   adminMetaValueStyle,
   adminPageShellStyle,
   adminPageTitleStyle,
@@ -24,8 +25,6 @@ import {
   adminSectionStyle,
   adminSectionTitleStyle,
 } from "./admin-ui-tokens";
-
-const QuillEditor = dynamic(() => import("./quill-editor"), { ssr: false });
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -45,13 +44,6 @@ function parseTags(str) {
     .filter(Boolean);
 }
 
-function parseFeatures(str) {
-  return str
-    .split("\n")
-    .map((f) => f.trim())
-    .filter(Boolean);
-}
-
 function parseSpecifications(str) {
   const obj = {};
   str.split("\n").forEach((line) => {
@@ -67,14 +59,13 @@ function parseSpecifications(str) {
 const EMPTY_FORM = {
   title: "",
   slug: "",
-  categorySlug: "",
+  categorySlugs: [],
   sku: "",
   stockQuantity: "",
   description: "",
   images: ["", "", "", ""],
   videoUrl: "",
   brochureUrl: "",
-  features: "",
   specifications: "",
   tags: "",
   longDescription: "",
@@ -104,7 +95,6 @@ export default function AdminProductForm({ mode = "create", productId }) {
   const isEdit = mode === "edit";
 
   const [form, setForm] = useState(EMPTY_FORM);
-  const [slugManual, setSlugManual] = useState(false);
   const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -142,21 +132,21 @@ export default function AdminProductForm({ mode = "create", productId }) {
         setForm({
           title: p.title || "",
           slug: p.slug || "",
-          categorySlug: p.categorySlug || "",
+          categorySlugs: Array.isArray(extras.categorySlugs) && extras.categorySlugs.length > 0
+            ? extras.categorySlugs
+            : [p.categorySlug].filter(Boolean),
           sku: extras.sku || "",
           stockQuantity: extras.quantity == null ? "" : extras.quantity > 0 ? "available" : "order",
           description: p.description || "",
           images: slots,
           videoUrl: extras.videoUrl || "",
           brochureUrl: extras.brochureUrl || "",
-          features: Array.isArray(extras.features) ? extras.features.join("\n") : "",
           specifications: extras.specifications && typeof extras.specifications === "object"
             ? Object.entries(extras.specifications).map(([k, v]) => `${k}: ${v}`).join("\n")
             : "",
           tags: Array.isArray(extras.tags) ? extras.tags.join(", ") : "",
           longDescription: extras.longDescription || "",
         });
-        setSlugManual(true);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -168,14 +158,9 @@ export default function AdminProductForm({ mode = "create", productId }) {
     setForm((prev) => ({
       ...prev,
       title: val,
-      slug: slugManual ? prev.slug : toSlug(val),
+      slug: isEdit ? prev.slug : toSlug(val),
     }));
-  }, [slugManual]);
-
-  const onSlugChange = useCallback((e) => {
-    setSlugManual(true);
-    setForm((prev) => ({ ...prev, slug: e.target.value }));
-  }, []);
+  }, [isEdit]);
 
   // ── Image slot ──
   const onUpload = async (e, slotIndex) => {
@@ -210,10 +195,16 @@ export default function AdminProductForm({ mode = "create", productId }) {
     setSaving(true);
     try {
       const images = ensureImageSlots(form.images).filter(Boolean);
+      if (form.categorySlugs.length === 0) {
+        setError("Kamida bitta kategoriya tanlang");
+        setSaving(false);
+        return;
+      }
       const payload = {
         title: form.title.trim(),
         slug: form.slug.trim(),
-        categorySlug: form.categorySlug,
+        categorySlug: form.categorySlugs[0] || "",
+        categorySlugs: form.categorySlugs,
         sku: form.sku.trim(),
         stockQuantity: form.stockQuantity === "available" ? 1 : form.stockQuantity === "order" ? 0 : null,
         description: form.description.trim(),
@@ -221,7 +212,6 @@ export default function AdminProductForm({ mode = "create", productId }) {
         imageUrl: images[0] || "",
         videoUrl: form.videoUrl.trim(),
         brochureUrl: form.brochureUrl.trim(),
-        features: parseFeatures(form.features),
         specifications: parseSpecifications(form.specifications),
         tags: parseTags(form.tags),
         longDescription: form.longDescription,
@@ -246,14 +236,23 @@ export default function AdminProductForm({ mode = "create", productId }) {
   };
 
   // ── Category grouping ──
-  const catsByGroup = categoryGroups.map((group) => ({
-    ...group,
-    cats: dbCategories.filter((c) => {
-      const cc = getCategoryBySlug(c.slug);
-      return cc?.groupKey === group.key;
-    }),
-  }));
-  const unmappedCats = dbCategories.filter((c) => !getCategoryBySlug(c.slug));
+  const dbCatSlugs = new Set(dbCategories.map((c) => c.slug));
+  const groupedCats = getCategoryGroups().map((group) => {
+    const cats = group.categories.flatMap((topCat) => {
+      if (topCat.children.length === 0) {
+        if (!dbCatSlugs.has(topCat.slug)) return [];
+        const dbCat = dbCategories.find((c) => c.slug === topCat.slug);
+        return [{ slug: topCat.slug, title: dbCat?.title || topCat.name }];
+      }
+      return topCat.children
+        .filter((child) => dbCatSlugs.has(child.slug))
+        .map((child) => {
+          const dbChild = dbCategories.find((c) => c.slug === child.slug);
+          return { slug: child.slug, title: dbChild?.title || child.name };
+        });
+    });
+    return { ...group, cats };
+  }).filter((g) => g.cats.length > 0);
   const imageSlots = ensureImageSlots(form.images);
   const selectedImagesCount = imageSlots.filter(Boolean).length;
 
@@ -266,10 +265,8 @@ export default function AdminProductForm({ mode = "create", productId }) {
       <div style={ambientGlowTopStyle} />
       <div style={ambientGlowSideStyle} />
 
-      <div style={pageContentStyle}>
-        {/* Header */}
-        <div style={heroStyle}>
-          <div style={heroMainStyle}>
+      <div style={heroStyle}>
+          <div style={{ minWidth: 0 }}>
             <button
               type="button"
               onClick={() => router.push("/admin/products")}
@@ -281,10 +278,12 @@ export default function AdminProductForm({ mode = "create", productId }) {
               {isEdit ? `Edit Product — ${form.slug || productId}` : "Create New Product"}
             </h1>
             <p style={heroSubtitleStyle}>
-              Build a clean, conversion-friendly product page with structured media, specs, and rich content.
+              {isEdit
+                ? "Update product details, images, categories, and description."
+                : "Fill in product details, images, categories, and description."}
             </p>
           </div>
-          <div style={heroMetaStyle}>
+          <div style={heroStatsStyle}>
             <div style={metaItemStyle}>
               <span style={metaLabelStyle}>Mode</span>
               <strong style={metaValueStyle}>{isEdit ? "Editing" : "Creating"}</strong>
@@ -299,7 +298,6 @@ export default function AdminProductForm({ mode = "create", productId }) {
             </div>
           </div>
         </div>
-      </div>
 
       {message && (
         <div style={alertSuccessStyle}>{message}</div>
@@ -311,67 +309,24 @@ export default function AdminProductForm({ mode = "create", productId }) {
       <form onSubmit={onSubmit} style={formLayoutStyle}>
         {/* ── Section: Basic Info ── */}
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Basic Info</div>
+          <div style={sectionTitleStyle}>Основная информация</div>
 
-          <div style={responsiveGridStyle}>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Title *</label>
+          {/* Row 1: Title | SKU | Наличие */}
+          <div style={threeColGridStyle}>
+            <div style={{ ...fieldStyle, gridColumn: "1 / 2" }}>
+              <label style={labelStyle}>Название *</label>
               <input
                 required
-                placeholder="Product title"
+                placeholder="Название продукта"
                 value={form.title}
                 onChange={onTitleChange}
                 style={inputStyle}
               />
             </div>
             <div style={fieldStyle}>
-              <label style={labelStyle}>
-                Slug&nbsp;
-                <span style={{ color: "#94a3b8", fontWeight: 400, fontSize: 11 }}>
-                  {slugManual ? "(manual)" : "(auto)"}
-                </span>
-              </label>
-              <input
-                placeholder="auto-from-title"
-                value={form.slug}
-                onChange={onSlugChange}
-                style={{ ...inputStyle, fontFamily: "monospace", fontSize: 13 }}
-              />
-            </div>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Category *</label>
-              <select
-                required
-                value={form.categorySlug}
-                onChange={(e) => setForm((prev) => ({ ...prev, categorySlug: e.target.value }))}
-                style={inputStyle}
-              >
-                <option value="">— select —</option>
-                {catsByGroup.map((group) =>
-                  group.cats.length > 0 ? (
-                    <optgroup key={group.key} label={group.name}>
-                      {group.cats.map((c) => (
-                        <option key={c.slug} value={c.slug}>{c.title || c.slug}</option>
-                      ))}
-                    </optgroup>
-                  ) : null
-                )}
-                {unmappedCats.length > 0 && (
-                  <optgroup label="Custom / Uncategorised">
-                    {unmappedCats.map((c) => (
-                      <option key={c.slug} value={c.slug}>{c.title || c.slug}</option>
-                    ))}
-                  </optgroup>
-                )}
-              </select>
-            </div>
-          </div>
-
-          <div style={responsiveGridStyle}>
-            <div style={fieldStyle}>
               <label style={labelStyle}>SKU</label>
               <input
-                placeholder="e.g. ABC-123"
+                placeholder="Артикул (ABC-123)"
                 value={form.sku}
                 onChange={(e) => setForm((prev) => ({ ...prev, sku: e.target.value }))}
                 style={{ ...inputStyle, fontFamily: "monospace" }}
@@ -391,16 +346,49 @@ export default function AdminProductForm({ mode = "create", productId }) {
             </div>
           </div>
 
+          {/* Row 2: Category pills */}
           <div style={fieldStyle}>
-            <label style={labelStyle}>Short Description</label>
-            <textarea
-              rows={3}
-              placeholder="Brief product description…"
-              value={form.description}
-              onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-              style={{ ...inputStyle, resize: "vertical" }}
-            />
+            <label style={labelStyle}>
+              Категории *
+              {form.categorySlugs.length > 0 && (
+                <span style={catSelectedBadgeStyle}>{form.categorySlugs.length} tanlangan</span>
+              )}
+            </label>
+            <div style={catPillsPanelStyle}>
+              {groupedCats.map((group) => (
+                <div key={group.key} style={catPillGroupStyle}>
+                  <span style={catPillGroupLabelStyle}>{group.name}</span>
+                  <div style={catPillsRowStyle}>
+                    {group.cats.map((cat) => {
+                      const checked = form.categorySlugs.includes(cat.slug);
+                      return (
+                        <button
+                          key={cat.slug}
+                          type="button"
+                          onClick={() =>
+                            setForm((prev) => ({
+                              ...prev,
+                              categorySlugs: checked
+                                ? prev.categorySlugs.filter((s) => s !== cat.slug)
+                                : [...prev.categorySlugs, cat.slug],
+                            }))
+                          }
+                          style={catPillStyle(checked)}
+                        >
+                          {checked && <span style={{ marginRight: 4, fontSize: 10 }}>✓</span>}
+                          {cat.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {form.categorySlugs.length === 0 && (
+              <span style={{ color: "#ef4444", fontSize: 11 }}>Kamida bitta kategoriya tanlang</span>
+            )}
           </div>
+
         </div>
 
         {/* ── Section: Images ── */}
@@ -466,69 +454,68 @@ export default function AdminProductForm({ mode = "create", productId }) {
           </div>
         </div>
 
-        {/* ── Section: Long Description ── */}
+        {/* ── Section: Описания ── */}
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Описание (rich text)</div>
-          <QuillEditor
-            value={form.longDescription}
-            onChange={(val) => setForm((prev) => ({ ...prev, longDescription: val }))}
-          />
-        </div>
-
-        {/* ── Section: Tags / Features / Specifications ── */}
-        <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Tags / Features / Specifications</div>
-          <div style={responsiveGridStyle}>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Tags <span style={hintStyle}>(comma-separated)</span></label>
+          <div style={sectionTitleStyle}>Описание</div>
+          <div style={descRowStyle}>
+            <div style={{ ...fieldStyle, flex: "0 0 300px" }}>
+              <label style={labelStyle}>Краткое описание</label>
               <textarea
-                rows={3}
-                placeholder="tag1, tag2, tag3"
-                value={form.tags}
-                onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
-                style={{ ...inputStyle, resize: "vertical" }}
+                rows={7}
+                placeholder="Краткое описание продукта…"
+                value={form.description}
+                onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+                style={{ ...inputStyle, resize: "vertical", height: "100%", minHeight: 120 }}
               />
             </div>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Features <span style={hintStyle}>(one per line)</span></label>
+            <div style={{ ...fieldStyle, flex: 1, minWidth: 0 }}>
+              <label style={labelStyle}>Полное описание</label>
               <textarea
-                rows={3}
-                placeholder={"Feature 1\nFeature 2"}
-                value={form.features}
-                onChange={(e) => setForm((prev) => ({ ...prev, features: e.target.value }))}
-                style={{ ...inputStyle, resize: "vertical" }}
-              />
-            </div>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Specifications <span style={hintStyle}>(Key: Value per line)</span></label>
-              <textarea
-                rows={3}
-                placeholder={"Weight: 1.2 kg\nColor: Red"}
-                value={form.specifications}
-                onChange={(e) => setForm((prev) => ({ ...prev, specifications: e.target.value }))}
-                style={{ ...inputStyle, resize: "vertical" }}
+                rows={10}
+                placeholder="Полное описание продукта…"
+                value={form.longDescription}
+                onChange={(e) => setForm((prev) => ({ ...prev, longDescription: e.target.value }))}
+                style={{ ...inputStyle, resize: "vertical", width: "100%", minHeight: 160 }}
               />
             </div>
           </div>
         </div>
 
-        {/* ── Section: Video / Brochure ── */}
+        {/* ── Section: Дополнительно ── */}
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Video / Brochure</div>
+          <div style={sectionTitleStyle}>Дополнительно</div>
           <div style={responsiveGridStyle}>
             <div style={fieldStyle}>
-              <label style={labelStyle}>Video URL</label>
+              <label style={labelStyle}>Теги <span style={hintStyle}>(через запятую)</span></label>
+              <input
+                type="text"
+                placeholder="rfid, библиотека, считыватель"
+                value={form.tags}
+                onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
+                style={inputStyle}
+              />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Характеристики <span style={hintStyle}>(Ключ: Значение, по одному на строку)</span></label>
+              <textarea
+                rows={3}
+                placeholder={"Вес: 1.2 кг\nЦвет: Чёрный"}
+                value={form.specifications}
+                onChange={(e) => setForm((prev) => ({ ...prev, specifications: e.target.value }))}
+                style={{ ...inputStyle, resize: "vertical" }}
+              />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Видео URL</label>
               <input
                 placeholder="https://youtube.com/…"
                 value={form.videoUrl}
                 onChange={(e) => setForm((prev) => ({ ...prev, videoUrl: e.target.value }))}
                 style={inputStyle}
               />
-            </div>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Brochure URL</label>
+              <label style={{ ...labelStyle, marginTop: 10 }}>Брошюра URL</label>
               <input
-                placeholder="https://… or /uploads/…"
+                placeholder="https://… или /uploads/…"
                 value={form.brochureUrl}
                 onChange={(e) => setForm((prev) => ({ ...prev, brochureUrl: e.target.value }))}
                 style={inputStyle}
@@ -583,19 +570,9 @@ const ambientGlowSideStyle = {
   background: "radial-gradient(circle, rgba(3,4,28,0.1) 0%, rgba(3,4,28,0) 72%)",
 };
 
-const pageContentStyle = {
-  maxWidth: 1260,
-};
-
 const heroStyle = {
   ...adminHeroStyle,
-  alignItems: "stretch",
   marginBottom: 18,
-  background: "linear-gradient(138deg, #03041C 0%, #15183B 62%, #21265E 100%)",
-};
-
-const heroMainStyle = {
-  minWidth: 0,
 };
 
 const pageTitleStyle = {
@@ -603,30 +580,11 @@ const pageTitleStyle = {
   margin: "12px 0 8px",
 };
 
-const heroSubtitleStyle = {
-  ...adminHeroSubtitleStyle,
-  color: "rgba(247, 248, 252, 0.8)",
-  maxWidth: 680,
-};
+const heroStatsStyle = adminHeroMetaWrapStyle;
 
-const heroMetaStyle = {
-  display: "grid",
-  gridTemplateColumns: "1fr",
-  gap: 8,
-  minWidth: 185,
-};
+const heroSubtitleStyle = adminHeroSubtitleStyle;
 
-const metaItemStyle = {
-  borderWidth: 1,
-  borderStyle: "solid",
-  borderColor: "rgba(255,255,255,0.16)",
-  background: "rgba(255,255,255,0.08)",
-  borderRadius: 10,
-  padding: "9px 11px",
-  display: "flex",
-  flexDirection: "column",
-  gap: 4,
-};
+const metaItemStyle = adminMetaPillStyle;
 
 const metaLabelStyle = adminMetaLabelStyle;
 
@@ -648,6 +606,13 @@ const formLayoutStyle = {
 };
 
 const responsiveGridStyle = adminResponsiveGridStyle;
+
+const threeColGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "1fr 180px 180px",
+  gap: 12,
+  alignItems: "start",
+};
 
 const imageGridStyle = adminImageGridStyle;
 
@@ -747,4 +712,69 @@ const footerBarStyle = {
   justifyContent: "flex-end",
   marginTop: 4,
   flexWrap: "wrap",
+};
+
+const catPillsPanelStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+  padding: "10px 14px",
+  background: "#F8F9FD",
+  borderRadius: 10,
+  border: "1px solid #E0E4F0",
+};
+
+const catPillGroupStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  flexWrap: "wrap",
+};
+
+const catPillGroupLabelStyle = {
+  fontSize: 11,
+  fontWeight: 700,
+  color: "#6B7280",
+  textTransform: "uppercase",
+  letterSpacing: "0.04em",
+  whiteSpace: "nowrap",
+  minWidth: 160,
+  flexShrink: 0,
+};
+
+const catPillsRowStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 6,
+};
+
+const catPillStyle = (checked) => ({
+  fontSize: 12,
+  fontWeight: checked ? 700 : 400,
+  padding: "4px 12px",
+  borderRadius: 999,
+  border: checked ? "1.5px solid #2B3A8B" : "1.5px solid #D0D5E8",
+  background: checked ? "#EEF0FF" : "#fff",
+  color: checked ? "#1a2460" : "#4B5563",
+  cursor: "pointer",
+  transition: "all 0.12s",
+  display: "flex",
+  alignItems: "center",
+  gap: 4,
+});
+
+const catSelectedBadgeStyle = {
+  marginLeft: 8,
+  background: "#2B3A8B",
+  color: "#fff",
+  borderRadius: 999,
+  padding: "1px 8px",
+  fontSize: 10,
+  fontWeight: 700,
+};
+
+const descRowStyle = {
+  display: "flex",
+  gap: 14,
+  alignItems: "flex-start",
 };

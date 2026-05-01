@@ -3256,7 +3256,6 @@ p.checkout-coupon button {
 
 .product__details-tab-content {
     padding: 30px 0;
-    overflow: hidden;
 }
 
 .product__details-tab-pane {
@@ -3264,7 +3263,7 @@ p.checkout-coupon button {
     line-height: 1.8;
     color: #525258;
     overflow-wrap: break-word;
-    word-break: break-word;
+    word-break: normal;
     max-width: 100%;
 
     p {
@@ -3351,9 +3350,8 @@ p.checkout-coupon button {
     line-height: 1.75;
     color: #03041C;
     max-width: 100%;
-    overflow: hidden;
     overflow-wrap: break-word;
-    word-break: break-word;
+    word-break: normal;
 
     img {
         max-width: 100%;

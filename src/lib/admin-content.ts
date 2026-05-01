@@ -46,6 +46,31 @@ function buildTranslations(title: string, description?: string, content?: string
   };
 }
 
+function getLocalUploadFilePath(url: string) {
+  if (typeof url !== "string") {
+    return null;
+  }
+
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  let pathname = trimmed;
+
+  try {
+    pathname = new URL(trimmed).pathname;
+  } catch {
+    pathname = trimmed;
+  }
+
+  if (!pathname.startsWith("/uploads/")) {
+    return null;
+  }
+
+  return path.join(process.cwd(), "public", pathname.replace(/^\//, ""));
+}
+
 export async function listAdminContent(resource: AdminResource, lang: Language = Language.RU) {
   if (resource === "categories") {
     const rows = await prisma.category.findMany({ orderBy: { updatedAt: "desc" }, take: 200 });
@@ -225,9 +250,17 @@ export async function createAdminContent(resource: AdminResource, payload: any) 
       throw new Error("categorySlug not found");
     }
 
+    // Auto-suffix slug if already taken
+    let finalSlug = normalizeSlug(payload?.slug || title);
+    let attempt = 0;
+    while (await prisma.product.findUnique({ where: { slug: finalSlug } })) {
+      attempt++;
+      finalSlug = `${normalizeSlug(payload?.slug || title)}-${attempt}`;
+    }
+
     const row = await prisma.product.create({
       data: {
-        slug,
+        slug: finalSlug,
         categoryId: category.id,
         imageUrl: (Array.isArray(payload?.images) && payload.images[0]) ? String(payload.images[0]).trim() : (imageUrl || null),
         price: payload?.price ?? null,
@@ -246,7 +279,8 @@ export async function createAdminContent(resource: AdminResource, payload: any) 
     }
     if (payload?.videoUrl) extras.videoUrl = String(payload.videoUrl).trim();
     if (payload?.brochureUrl) extras.brochureUrl = String(payload.brochureUrl).trim();
-    if (payload?.longDescription) extras.longDescription = String(payload.longDescription);
+    if (payload?.longDescription) extras.longDescription = String(payload.longDescription).replace(/\u00AD/g, '');
+    if (Array.isArray(payload?.categorySlugs) && payload.categorySlugs.length > 0) extras.categorySlugs = payload.categorySlugs;
 
     const extrasContent = Object.keys(extras).length > 0 ? JSON.stringify(extras) : content;
 
@@ -373,7 +407,8 @@ export async function updateAdminContent(resource: AdminResource, id: string, pa
     }
     if (payload?.videoUrl) extras.videoUrl = String(payload.videoUrl).trim();
     if (payload?.brochureUrl) extras.brochureUrl = String(payload.brochureUrl).trim();
-    if (payload?.longDescription) extras.longDescription = String(payload.longDescription);
+    if (payload?.longDescription) extras.longDescription = String(payload.longDescription).replace(/\u00AD/g, '');
+    if (Array.isArray(payload?.categorySlugs) && payload.categorySlugs.length > 0) extras.categorySlugs = payload.categorySlugs;
     const extrasContent = Object.keys(extras).length > 0 ? JSON.stringify(extras) : null;
 
     // Update translations for all languages (use findFirst+update/create — no composite unique on entityType+entityId+language)
@@ -448,14 +483,20 @@ export async function deleteAdminContent(resource: AdminResource, id: string) {
       } catch {}
     }
     const deleted = await prisma.product.delete({ where: { id } });
-    // Delete local files asynchronously (don't fail if file missing)
-    const uploadDir = path.join(process.cwd(), "public");
-    for (const url of imagesToDelete) {
-      if (typeof url === "string" && url.startsWith("/uploads/")) {
-        const filePath = path.join(uploadDir, url.replace(/\/uploads\//, "uploads/"));
-        unlink(filePath).catch(() => {});
-      }
-    }
+    await Promise.all(
+      imagesToDelete.map(async (url) => {
+        const filePath = getLocalUploadFilePath(url);
+        if (!filePath) {
+          return;
+        }
+
+        try {
+          await unlink(filePath);
+        } catch {
+          // Ignore missing files and continue deleting the product.
+        }
+      })
+    );
     return deleted;
   }
   if (resource === "blog") return prisma.post.delete({ where: { id } });
