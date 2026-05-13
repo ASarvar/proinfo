@@ -234,8 +234,10 @@ export async function createAdminContent(resource: AdminResource, payload: any) 
   }
 
   if (resource === "categories") {
+    const parentSlug = (payload?.parentSlug || "").trim() || null;
+    const contentJson = parentSlug ? JSON.stringify({ parentSlug }) : undefined;
     const row = await prisma.category.create({ data: { slug, imageUrl } });
-    await createEntityTranslations("Category", row.id, buildTranslations(title, description, content));
+    await createEntityTranslations("Category", row.id, buildTranslations(title, description, contentJson));
     return { id: row.id, slug: row.slug };
   }
 

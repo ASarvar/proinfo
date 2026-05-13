@@ -2,6 +2,8 @@ import { cookies } from "next/headers";
 import { parseSession } from "@lib/admin-auth";
 import { prisma } from "@lib/api-helpers";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 import {
   adminGroupBodyStyle,
   adminGroupCardStyle,

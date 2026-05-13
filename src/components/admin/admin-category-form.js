@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { catalogCategories, categoryGroups } from "@data/catalog-categories";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   adminAlertErrorStyle,
   adminAlertSuccessStyle,
@@ -19,88 +18,41 @@ import {
   adminPageShellStyle,
   adminPageTitleStyle,
   adminPrimaryCtaStyle,
-  adminResponsiveGridStyle,
   adminSecondaryButtonStyle,
   adminSectionStyle,
   adminSectionTitleStyle,
-  adminUploadLabelStyle,
 } from "./admin-ui-tokens";
-
-const slugify = (value = "") =>
-  value
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
 
 const getEmptyForm = () => ({
   title: "",
-  slug: "",
-  groupKey: categoryGroups[0]?.key ?? "",
   parentSlug: "",
   imageUrl: "",
 });
 
 export default function AdminCategoryForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [form, setForm] = useState(getEmptyForm);
-  const [slugManual, setSlugManual] = useState(false);
+  const [allCategories, setAllCategories] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const initialPrefill = useMemo(() => {
-    const nextForm = getEmptyForm();
-    const title = searchParams.get("title") || "";
-    const slug = searchParams.get("slug") || "";
-    const groupKey = searchParams.get("groupKey") || nextForm.groupKey;
-    const parentSlug = searchParams.get("parentSlug") || "";
-    const imageUrl = searchParams.get("imageUrl") || "";
+  const loadCategories = useCallback(async () => {
+    try {
+      const res = await fetch("/api/categories?lang=RU&limit=200");
+      const json = await res.json();
+      if (json?.success) setAllCategories(json.data || []);
+    } catch {}
+  }, []);
 
-    return {
-      form: {
-        title,
-        slug,
-        groupKey,
-        parentSlug,
-        imageUrl,
-      },
-      slugManual: slug.length > 0,
-    };
-  }, [searchParams]);
+  useEffect(() => { loadCategories(); }, [loadCategories]);
 
-  useEffect(() => {
-    setForm(initialPrefill.form);
-    setSlugManual(initialPrefill.slugManual);
-  }, [initialPrefill]);
-
-  const onTitleChange = (event) => {
-    const title = event.target.value;
-    setForm((prev) => ({
-      ...prev,
-      title,
-      slug: slugManual ? prev.slug : slugify(title),
-    }));
-  };
-
-  const onSlugChange = (event) => {
-    const slug = event.target.value;
-    setSlugManual(slug.length > 0);
-    setForm((prev) => ({ ...prev, slug }));
-  };
-
-  const onGroupChange = (event) => {
-    setForm((prev) => ({ ...prev, groupKey: event.target.value, parentSlug: "" }));
-  };
+  // Only top-level categories can be parents
+  const topLevelCategories = allCategories.filter((c) => !c.parentSlug);
 
   const resetForm = () => {
-    const nextForm = getEmptyForm();
-    setForm(nextForm);
-    setSlugManual(false);
+    setForm(getEmptyForm());
     setMessage("");
     setError("");
   };
@@ -132,10 +84,10 @@ export default function AdminCategoryForm() {
     setMessage("");
     setSaving(true);
 
-    const finalSlug = form.slug || slugify(form.title);
-    if (!finalSlug) {
+    const title = form.title.trim();
+    if (!title) {
       setSaving(false);
-      setError("Slug is required. For non-Latin titles, enter a slug manually.");
+      setError("Title is required.");
       return;
     }
 
@@ -144,9 +96,9 @@ export default function AdminCategoryForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: form.title.trim(),
-          slug: finalSlug,
+          title,
           imageUrl: form.imageUrl || null,
+          parentSlug: form.parentSlug || null,
         }),
       });
       const json = await response.json();
@@ -160,7 +112,7 @@ export default function AdminCategoryForm() {
     }
   };
 
-  const parentOptions = catalogCategories.filter((category) => category.groupKey === form.groupKey && !category.parentSlug);
+  const isSubcategory = !!form.parentSlug;
 
   return (
     <section style={pageShellStyle}>
@@ -174,7 +126,7 @@ export default function AdminCategoryForm() {
           </button>
           <h1 style={pageTitleStyle}>Create New Category</h1>
           <p style={heroSubtitleStyle}>
-            Add a new category in a dedicated flow, with optional pre-filled values from the catalog structure.
+            Add a top-level category or a subcategory under an existing one.
           </p>
         </div>
         <div style={heroMetaStyle}>
@@ -183,8 +135,8 @@ export default function AdminCategoryForm() {
             <strong style={metaValueStyle}>Creating</strong>
           </div>
           <div style={metaPillStyle}>
-            <span style={metaLabelStyle}>Group</span>
-            <strong style={metaValueStyle}>{form.groupKey || "—"}</strong>
+            <span style={metaLabelStyle}>Level</span>
+            <strong style={metaValueStyle}>{isSubcategory ? "Subcategory" : "Top-level"}</strong>
           </div>
         </div>
       </div>
@@ -196,50 +148,60 @@ export default function AdminCategoryForm() {
         <div style={sectionTitleStyle}>Category Details</div>
         <form onSubmit={onSubmit}>
           <div style={formGridStyle}>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Title</label>
-              <input required placeholder="Category title" value={form.title} onChange={onTitleChange} style={inputStyle} />
+            {/* Left column: Category select + name input stacked */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Category</label>
+                <select value={form.parentSlug} onChange={(e) => setForm((prev) => ({ ...prev, parentSlug: e.target.value, title: "" }))} style={inputStyle}>
+                  <option value="">— top-level category —</option>
+                  {topLevelCategories.map((cat) => (
+                    <option key={cat.slug} value={cat.slug}>{cat.title || cat.slug}</option>
+                  ))}
+                </select>
+              </div>
+
+              {!isSubcategory && (
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>Category name</label>
+                  <input
+                    required
+                    placeholder="Enter category name"
+                    value={form.title}
+                    onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+              )}
+
+              {isSubcategory && (
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>Subcategory</label>
+                  <input
+                    required
+                    placeholder="Enter subcategory name"
+                    value={form.title}
+                    onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+              )}
             </div>
 
-            <div style={fieldStyle}>
-              <label style={labelStyle}>
-                Slug <span style={inlineHintStyle}>{slugManual ? "(manual)" : "(auto)"}</span>
-              </label>
-              <input placeholder="auto-from-title" value={form.slug} onChange={onSlugChange} style={{ ...inputStyle, fontFamily: "monospace", fontSize: 13 }} />
-            </div>
-
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Group</label>
-              <select value={form.groupKey} onChange={onGroupChange} style={inputStyle}>
-                {categoryGroups.map((group) => (
-                  <option key={group.key} value={group.key}>{group.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div style={fieldStyle}>
-              <label style={labelStyle}>
-                Parent category <span style={inlineHintStyle}>(optional)</span>
-              </label>
-              <select value={form.parentSlug} onChange={(event) => setForm((prev) => ({ ...prev, parentSlug: event.target.value }))} style={inputStyle}>
-                <option value="">— top level —</option>
-                {parentOptions.map((category) => (
-                  <option key={category.slug} value={category.slug}>{category.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Image URL</label>
-              <input placeholder="Paste URL or upload →" value={form.imageUrl} onChange={(event) => setForm((prev) => ({ ...prev, imageUrl: event.target.value }))} style={inputStyle} />
-            </div>
+            {/* Right column: Upload image area (full height) */}
+            <label style={uploadAreaStyle}>
+              <div style={{ pointerEvents: "none" }}>
+                {uploading ? "Uploading…" : form.imageUrl ? "Image uploaded ✓" : "Upload image"}
+                {form.imageUrl && (
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 6, wordBreak: "break-all", maxWidth: 220 }}>
+                    {form.imageUrl.split("/").pop()}
+                  </div>
+                )}
+              </div>
+              <input type="file" accept="image/*" onChange={onUpload} style={{ display: "none" }} />
+            </label>
           </div>
 
           <div style={actionRowStyle}>
-            <label style={uploadLabelStyle}>
-              {uploading ? "Uploading…" : "Upload image"}
-              <input type="file" accept="image/*" onChange={onUpload} style={{ display: "none" }} />
-            </label>
             <button type="submit" disabled={saving} style={{ ...primaryButtonStyle, opacity: saving ? 0.7 : 1 }}>
               {saving ? "Creating…" : "Create"}
             </button>
@@ -272,13 +234,30 @@ const alertErrorStyle = adminAlertErrorStyle;
 const sectionStyle = adminSectionStyle;
 const sectionTitleStyle = adminSectionTitleStyle;
 const formGridStyle = {
-  ...adminResponsiveGridStyle,
-  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 16,
+  alignItems: "stretch",
 };
 const fieldStyle = { display: "flex", flexDirection: "column", gap: 4 };
 const labelStyle = adminLabelStyle;
 const inputStyle = adminInputStyle;
-const uploadLabelStyle = adminUploadLabelStyle;
+const uploadAreaStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "column",
+  textAlign: "center",
+  border: "2px dashed #CCD5E6",
+  borderRadius: 10,
+  background: "#F4F7FF",
+  color: "#4E556B",
+  fontSize: 14,
+  fontWeight: 700,
+  cursor: "pointer",
+  padding: 16,
+  minHeight: 110,
+};
 const primaryButtonStyle = adminPrimaryCtaStyle;
 const secondaryButtonStyle = adminSecondaryButtonStyle;
 const actionRowStyle = {
@@ -288,7 +267,6 @@ const actionRowStyle = {
   alignItems: "center",
   flexWrap: "wrap",
 };
-const inlineHintStyle = { color: "#94a3b8", fontWeight: 400, fontSize: 11 };
 const backButtonStyle = {
   background: "rgba(255,255,255,0.09)",
   borderWidth: 1,

@@ -128,12 +128,13 @@ export default function AdminShell({ children, role, username }) {
 }
 
 const shellStyle = {
-  minHeight: "100vh",
+  height: "100vh",
   display: "grid",
   gridTemplateColumns: "280px minmax(0, 1fr)",
   background: "linear-gradient(180deg, #F6F8FC 0%, #EEF2F8 100%)",
   position: "relative",
   isolation: "isolate",
+  overflow: "hidden",
 };
 
 const shellGlowTopStyle = {
@@ -162,7 +163,9 @@ const sidebarStyle = {
   boxShadow: "8px 0 28px rgba(3,4,28,0.16)",
   position: "sticky",
   top: 0,
-  minHeight: "100vh",
+  height: "100vh",
+  overflowY: "auto",
+  overflowX: "hidden",
 };
 
 const brandStyle = {
@@ -284,6 +287,8 @@ const logoutButtonStyle = {
 const mainStyle = {
   minWidth: 0,
   padding: "18px 22px 28px",
+  overflowY: "auto",
+  height: "100vh",
 };
 
 const headerStyle = {

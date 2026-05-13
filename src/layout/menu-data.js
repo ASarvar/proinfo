@@ -1,59 +1,50 @@
-import { getCategoryGroups } from "@data/catalog-categories";
 import productsData from "@data/products";
 import { getProductsByCategorySlug } from "@utils/catalog-map";
 
-const buildProductMegaCatalog = (t, locale) => {
-  const mainCategories = getCategoryGroups().map((group) => {
-    // Each group maps to exactly one top-level category
-    const topCat = group.categories[0];
-    if (!topCat) return null;
-
-    const children = topCat.children || [];
-
-    // Subcategories = children of the top-level category.
-    // For standalone categories (no children), use the top-level itself as the only entry.
+// categories: array of DB category objects { slug, title, parentSlug }
+const buildProductMegaCatalog = (t, locale, categories) => {
+  const topLevel = categories.filter((c) => !c.parentSlug);
+  const mainCategories = topLevel.map((parent) => {
+    const children = categories.filter((c) => c.parentSlug === parent.slug);
     const subcategories = children.length > 0
       ? children.map((child) => ({
           slug: child.slug,
-          title: child.name,
+          title: child.title || child.slug,
           link: `/${locale}/category/${child.slug}/products`,
           products: getProductsByCategorySlug(productsData, child.slug),
         }))
       : [{
-          slug: topCat.slug,
-          title: topCat.name,
-          link: `/${locale}/category/${topCat.slug}/products`,
-          products: getProductsByCategorySlug(productsData, topCat.slug),
+          slug: parent.slug,
+          title: parent.title || parent.slug,
+          link: `/${locale}/category/${parent.slug}/products`,
+          products: getProductsByCategorySlug(productsData, parent.slug),
         }];
-
     return {
-      slug: group.key,
-      title: group.name,
-      link: `/${locale}/category/${topCat.slug}`,
+      slug: parent.slug,
+      title: parent.title || parent.slug,
+      link: `/${locale}/category/${parent.slug}`,
       subcategories,
     };
-  }).filter(Boolean);
-
+  });
   return { mainCategories };
 };
 
-const getMenuData = (t, locale) => [
+const getMenuData = (t, locale, categories = []) => [
   {
     id: 1,
     title: t("nav.products"),
     link: `/${locale}/products`,
     megaMenu: true,
     hasDropdown: true,
-    megaCatalog: buildProductMegaCatalog(t, locale),
-    submenus: getCategoryGroups().map((group) => {
-      const topCat = group.categories[0];
-      const children = topCat?.children || [];
+    megaCatalog: buildProductMegaCatalog(t, locale, categories),
+    submenus: categories.filter((c) => !c.parentSlug).map((parent) => {
+      const children = categories.filter((c) => c.parentSlug === parent.slug);
       return {
-        title: group.name,
-        link: `/${locale}/category/${topCat?.slug || ""}`,
+        title: parent.title || parent.slug,
+        link: `/${locale}/category/${parent.slug}`,
         hasDropdown: children.length > 0,
         submenus: children.map((child) => ({
-          title: child.name,
+          title: child.title || child.slug,
           link: `/${locale}/category/${child.slug}/products`,
         })),
       };

@@ -3,6 +3,8 @@ import { prisma, getEntityTranslations, formatResponse, formatError, Language, c
 import { requireAdmin } from "../../../lib/api-auth";
 import { normalizeSlug, normalizeText, isValidSlug } from "../../../lib/validation";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/categories
  * Get all categories with optional filtering
@@ -29,12 +31,22 @@ export async function GET(request: NextRequest) {
     const enriched = await Promise.all(
       categories.map(async (cat) => {
         const translations = await getEntityTranslations("Category", cat.id, [lang]);
+        const catTrans = translations[lang] || {};
+        let parentSlug: string | null = null;
+        if (catTrans.content) {
+          try {
+            const extras = JSON.parse(catTrans.content);
+            parentSlug = extras?.parentSlug || null;
+          } catch {}
+        }
         return {
           id: cat.id,
           slug: cat.slug,
           imageUrl: cat.imageUrl,
           productCount: cat.products.length,
-          ...translations[lang],
+          title: catTrans.title,
+          description: catTrans.description,
+          parentSlug,
           createdAt: cat.createdAt,
           updatedAt: cat.updatedAt,
         };

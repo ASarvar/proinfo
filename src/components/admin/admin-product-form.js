@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCategoryGroups } from "@data/catalog-categories";
+
 import {
   adminAlertErrorStyle,
   adminAlertSuccessStyle,
@@ -101,6 +101,7 @@ export default function AdminProductForm({ mode = "create", productId }) {
   const [uploadingSlot, setUploadingSlot] = useState(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [expandedGroup, setExpandedGroup] = useState(null);
 
   // ── Load categories ──
   useEffect(() => {
@@ -235,23 +236,14 @@ export default function AdminProductForm({ mode = "create", productId }) {
     }
   };
 
-  // ── Category grouping ──
-  const dbCatSlugs = new Set(dbCategories.map((c) => c.slug));
-  const groupedCats = getCategoryGroups().map((group) => {
-    const cats = group.categories.flatMap((topCat) => {
-      if (topCat.children.length === 0) {
-        if (!dbCatSlugs.has(topCat.slug)) return [];
-        const dbCat = dbCategories.find((c) => c.slug === topCat.slug);
-        return [{ slug: topCat.slug, title: dbCat?.title || topCat.name }];
-      }
-      return topCat.children
-        .filter((child) => dbCatSlugs.has(child.slug))
-        .map((child) => {
-          const dbChild = dbCategories.find((c) => c.slug === child.slug);
-          return { slug: child.slug, title: dbChild?.title || child.name };
-        });
-    });
-    return { ...group, cats };
+  // ── Category grouping — built purely from DB categories ──
+  const topLevelCats = dbCategories.filter((c) => !c.parentSlug);
+  const groupedCats = topLevelCats.map((parent) => {
+    const children = dbCategories.filter((c) => c.parentSlug === parent.slug);
+    const cats = children.length > 0
+      ? children.map((c) => ({ slug: c.slug, title: c.title || c.slug }))
+      : [{ slug: parent.slug, title: parent.title || parent.slug }];
+    return { key: parent.slug, name: parent.title || parent.slug, cats };
   }).filter((g) => g.cats.length > 0);
   const imageSlots = ensureImageSlots(form.images);
   const selectedImagesCount = imageSlots.filter(Boolean).length;
@@ -307,239 +299,292 @@ export default function AdminProductForm({ mode = "create", productId }) {
       )}
 
       <form onSubmit={onSubmit} style={formLayoutStyle}>
-        {/* ── Section: Basic Info ── */}
-        <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Основная информация</div>
 
-          {/* Row 1: Title | SKU | Наличие */}
-          <div style={threeColGridStyle}>
-            <div style={{ ...fieldStyle, gridColumn: "1 / 2" }}>
-              <label style={labelStyle}>Название *</label>
+        {/* ══════════════════ LEFT: main column ══════════════════ */}
+        <div style={mainColStyle}>
+
+          {/* General */}
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>General</div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Title <span style={requiredStarStyle}>*</span></label>
               <input
                 required
-                placeholder="Название продукта"
+                placeholder="Product Title"
                 value={form.title}
                 onChange={onTitleChange}
                 style={inputStyle}
               />
             </div>
             <div style={fieldStyle}>
-              <label style={labelStyle}>SKU</label>
-              <input
-                placeholder="Артикул (ABC-123)"
-                value={form.sku}
-                onChange={(e) => setForm((prev) => ({ ...prev, sku: e.target.value }))}
-                style={{ ...inputStyle, fontFamily: "monospace" }}
-              />
-            </div>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Наличие</label>
-              <select
-                value={form.stockQuantity}
-                onChange={(e) => setForm((prev) => ({ ...prev, stockQuantity: e.target.value }))}
-                style={inputStyle}
-              >
-                <option value="">— не указано —</option>
-                <option value="available">В наличии</option>
-                <option value="order">Под заказ</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Row 2: Category pills */}
-          <div style={fieldStyle}>
-            <label style={labelStyle}>
-              Категории *
-              {form.categorySlugs.length > 0 && (
-                <span style={catSelectedBadgeStyle}>{form.categorySlugs.length} tanlangan</span>
-              )}
-            </label>
-            <div style={catPillsPanelStyle}>
-              {groupedCats.map((group) => (
-                <div key={group.key} style={catPillGroupStyle}>
-                  <span style={catPillGroupLabelStyle}>{group.name}</span>
-                  <div style={catPillsRowStyle}>
-                    {group.cats.map((cat) => {
-                      const checked = form.categorySlugs.includes(cat.slug);
-                      return (
-                        <button
-                          key={cat.slug}
-                          type="button"
-                          onClick={() =>
-                            setForm((prev) => ({
-                              ...prev,
-                              categorySlugs: checked
-                                ? prev.categorySlugs.filter((s) => s !== cat.slug)
-                                : [...prev.categorySlugs, cat.slug],
-                            }))
-                          }
-                          style={catPillStyle(checked)}
-                        >
-                          {checked && <span style={{ marginRight: 4, fontSize: 10 }}>✓</span>}
-                          {cat.title}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {form.categorySlugs.length === 0 && (
-              <span style={{ color: "#ef4444", fontSize: 11 }}>Kamida bitta kategoriya tanlang</span>
-            )}
-          </div>
-
-        </div>
-
-        {/* ── Section: Images ── */}
-        <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Images (up to 4)</div>
-          <div style={imageGridStyle}>
-            {imageSlots.map((url, i) => (
-              <div key={i} style={imageSlotStyle}>
-                {/* Thumbnail */}
-                <div style={thumbContainerStyle}>
-                  {url ? (
-                    <img
-                      src={url}
-                      alt={`slot ${i + 1}`}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 6 }}
-                    />
-                  ) : (
-                    <span style={{ color: "#C0C0C8", fontSize: 12 }}>
-                      {i === 0 ? "Main" : `Photo ${i + 1}`}
-                    </span>
-                  )}
-                </div>
-                {/* URL input */}
-                <input
-                  placeholder="Paste URL…"
-                  value={url}
-                  onChange={(e) => {
-                    const imgs = ensureImageSlots(form.images);
-                    imgs[i] = e.target.value;
-                    setForm((prev) => ({ ...prev, images: imgs }));
-                  }}
-                  style={{ ...inputStyle, fontSize: 11, fontFamily: "monospace", padding: "5px 8px" }}
-                />
-                {/* Upload + remove */}
-                <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-                  <label style={{ ...btnUploadStyle, flex: 1, textAlign: "center", cursor: "pointer" }}>
-                    {uploadingSlot === i ? "…" : "Upload"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={(e) => onUpload(e, i)}
-                      disabled={uploadingSlot !== null}
-                    />
-                  </label>
-                  {url && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const imgs = ensureImageSlots(form.images);
-                        imgs[i] = "";
-                        setForm((prev) => ({ ...prev, images: imgs }));
-                      }}
-                      style={btnRemoveImgStyle}
-                      title="Remove"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Section: Описания ── */}
-        <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Описание</div>
-          <div style={descRowStyle}>
-            <div style={{ ...fieldStyle, flex: "0 0 300px" }}>
-              <label style={labelStyle}>Краткое описание</label>
+              <label style={labelStyle}>Short Description</label>
               <textarea
-                rows={7}
-                placeholder="Краткое описание продукта…"
+                rows={4}
+                placeholder="Short product description…"
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                style={{ ...inputStyle, resize: "vertical", height: "100%", minHeight: 120 }}
+                style={{ ...inputStyle, resize: "vertical" }}
               />
             </div>
-            <div style={{ ...fieldStyle, flex: 1, minWidth: 0 }}>
-              <label style={labelStyle}>Полное описание</label>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Full Description</label>
               <textarea
-                rows={10}
-                placeholder="Полное описание продукта…"
+                rows={8}
+                placeholder="Full product description…"
                 value={form.longDescription}
                 onChange={(e) => setForm((prev) => ({ ...prev, longDescription: e.target.value }))}
-                style={{ ...inputStyle, resize: "vertical", width: "100%", minHeight: 160 }}
+                style={{ ...inputStyle, resize: "vertical" }}
               />
             </div>
           </div>
-        </div>
 
-        {/* ── Section: Дополнительно ── */}
-        <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Дополнительно</div>
-          <div style={responsiveGridStyle}>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Теги <span style={hintStyle}>(через запятую)</span></label>
-              <input
-                type="text"
-                placeholder="rfid, библиотека, считыватель"
-                value={form.tags}
-                onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
-                style={inputStyle}
-              />
+          {/* Details */}
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>Details</div>
+            <div style={twoColStyle}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>SKU</label>
+                <input
+                  placeholder="ABC-123"
+                  value={form.sku}
+                  onChange={(e) => setForm((prev) => ({ ...prev, sku: e.target.value }))}
+                  style={{ ...inputStyle, fontFamily: "monospace" }}
+                />
+                <span style={hintStyle}>Enter the product SKU.</span>
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Availability</label>
+                <select
+                  value={form.stockQuantity}
+                  onChange={(e) => setForm((prev) => ({ ...prev, stockQuantity: e.target.value }))}
+                  style={inputStyle}
+                >
+                  <option value="">— not set —</option>
+                  <option value="available">In Stock</option>
+                  <option value="order">On Order</option>
+                </select>
+                <span style={hintStyle}>Set the product availability.</span>
+              </div>
             </div>
             <div style={fieldStyle}>
-              <label style={labelStyle}>Характеристики <span style={hintStyle}>(Ключ: Значение, по одному на строку)</span></label>
+              <label style={labelStyle}>
+                Specifications{" "}
+                <span style={hintStyle}>(Key: Value, one per line)</span>
+              </label>
               <textarea
-                rows={3}
-                placeholder={"Вес: 1.2 кг\nЦвет: Чёрный"}
+                rows={4}
+                placeholder={"Weight: 1.2 kg\nColor: Black"}
                 value={form.specifications}
                 onChange={(e) => setForm((prev) => ({ ...prev, specifications: e.target.value }))}
                 style={{ ...inputStyle, resize: "vertical" }}
               />
             </div>
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Видео URL</label>
-              <input
-                placeholder="https://youtube.com/…"
-                value={form.videoUrl}
-                onChange={(e) => setForm((prev) => ({ ...prev, videoUrl: e.target.value }))}
-                style={inputStyle}
-              />
-              <label style={{ ...labelStyle, marginTop: 10 }}>Брошюра URL</label>
-              <input
-                placeholder="https://… или /uploads/…"
-                value={form.brochureUrl}
-                onChange={(e) => setForm((prev) => ({ ...prev, brochureUrl: e.target.value }))}
-                style={inputStyle}
-              />
+          </div>
+
+          {/* Media Links */}
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>Media Links</div>
+            <div style={twoColStyle}>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Video URL</label>
+                <input
+                  placeholder="https://youtube.com/…"
+                  value={form.videoUrl}
+                  onChange={(e) => setForm((prev) => ({ ...prev, videoUrl: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Brochure URL</label>
+                <input
+                  placeholder="https://… or /uploads/…"
+                  value={form.brochureUrl}
+                  onChange={(e) => setForm((prev) => ({ ...prev, brochureUrl: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
             </div>
+          </div>
+
+          {/* Footer */}
+          <div style={footerBarStyle}>
+            <button
+              type="button"
+              onClick={() => router.push("/admin/products")}
+              style={btnCancelStyle}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              style={{ ...btnSaveStyle, opacity: saving ? 0.7 : 1 }}
+            >
+              {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Product"}
+            </button>
           </div>
         </div>
 
-        {/* ── Footer ── */}
-        <div style={footerBarStyle}>
-          <button
-            type="button"
-            onClick={() => router.push("/admin/products")}
-            style={btnCancelStyle}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            style={{ ...btnSaveStyle, opacity: saving ? 0.7 : 1 }}
-          >
-            {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Product"}
-          </button>
+        {/* ══════════════════ RIGHT: sidebar column ══════════════════ */}
+        <div style={sidebarColStyle}>
+
+          {/* Upload Images */}
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>
+              Upload Image
+              <span style={imgCountBadgeStyle}>{selectedImagesCount}/4</span>
+            </div>
+            <div style={imageGridStyle}>
+              {imageSlots.map((url, i) => (
+                <div key={i} style={imageSlotStyle}>
+                  <div style={thumbContainerStyle}>
+                    {url ? (
+                      <img
+                        src={url}
+                        alt={`slot ${i + 1}`}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 6 }}
+                      />
+                    ) : (
+                      <span style={{ color: "#B0B8D0", fontSize: 11 }}>
+                        {i === 0 ? "Main" : `Photo ${i + 1}`}
+                      </span>
+                    )}
+                  </div>
+                  <input
+                    placeholder="Paste URL…"
+                    value={url}
+                    onChange={(e) => {
+                      const imgs = ensureImageSlots(form.images);
+                      imgs[i] = e.target.value;
+                      setForm((prev) => ({ ...prev, images: imgs }));
+                    }}
+                    style={{ ...inputStyle, fontSize: 11, fontFamily: "monospace", padding: "5px 8px" }}
+                  />
+                  <div style={{ display: "flex", gap: 5, marginTop: 3 }}>
+                    <label style={{ ...btnUploadStyle, flex: 1, textAlign: "center", cursor: "pointer" }}>
+                      {uploadingSlot === i ? "…" : "Upload"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => onUpload(e, i)}
+                        disabled={uploadingSlot !== null}
+                      />
+                    </label>
+                    {url && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const imgs = ensureImageSlots(form.images);
+                          imgs[i] = "";
+                          setForm((prev) => ({ ...prev, images: imgs }));
+                        }}
+                        style={btnRemoveImgStyle}
+                        title="Remove"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Category */}
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>
+              Product Category
+              {form.categorySlugs.length > 0 && (
+                <span style={catSelectedBadgeStyle}>{form.categorySlugs.length} selected</span>
+              )}
+            </div>
+            <div style={catAccordionStyle}>
+              {groupedCats.map((group) => {
+                const isOpen = expandedGroup === group.key;
+                const groupChecked = group.cats.some((c) => form.categorySlugs.includes(c.slug));
+                const hasSubs = group.cats.length > 1 || (group.cats.length === 1 && group.cats[0].slug !== group.key);
+                return (
+                  <div key={group.key} style={catDropdownItemStyle(groupChecked)}>
+                    {/* Header row — clicking selects top-level OR toggles subs */}
+                    <div
+                      style={catDropdownHeaderStyle(groupChecked)}
+                      onClick={() => {
+                        if (hasSubs) {
+                          setExpandedGroup(isOpen ? null : group.key);
+                        } else {
+                          // no subs — directly toggle this cat
+                          const slug = group.cats[0]?.slug;
+                          if (!slug) return;
+                          setForm((prev) => ({
+                            ...prev,
+                            categorySlugs: prev.categorySlugs.includes(slug)
+                              ? prev.categorySlugs.filter((s) => s !== slug)
+                              : [...prev.categorySlugs, slug],
+                          }));
+                        }
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        {groupChecked && <span style={catCheckmarkStyle}>✓</span>}
+                        <span style={catDropdownNameStyle(groupChecked)}>{group.name}</span>
+                      </div>
+                      {hasSubs && (
+                        <span style={catChevronStyle(isOpen)}>{isOpen ? "▲" : "▼"}</span>
+                      )}
+                    </div>
+                    {/* Subcategory pills — shown when expanded */}
+                    {hasSubs && isOpen && (
+                      <div style={catSubPillsStyle}>
+                        {group.cats.map((cat) => {
+                          const checked = form.categorySlugs.includes(cat.slug);
+                          return (
+                            <button
+                              key={cat.slug}
+                              type="button"
+                              onClick={() =>
+                                setForm((prev) => ({
+                                  ...prev,
+                                  categorySlugs: checked
+                                    ? prev.categorySlugs.filter((s) => s !== cat.slug)
+                                    : [...prev.categorySlugs, cat.slug],
+                                }))
+                              }
+                              style={catPillStyle(checked)}
+                            >
+                              {checked && <span style={{ marginRight: 4, fontSize: 10 }}>✓</span>}
+                              {cat.title}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {form.categorySlugs.length === 0 && (
+              <span style={{ color: "#ef4444", fontSize: 11, marginTop: 4, display: "block" }}>
+                Select at least one category
+              </span>
+            )}
+          </div>
+
+          {/* Product Tags */}
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>Product Tags</div>
+            <div style={fieldStyle}>
+              <input
+                type="text"
+                placeholder="enter tags"
+                value={form.tags}
+                onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
+                style={inputStyle}
+              />
+              <span style={hintStyle}>Separate tags with commas</span>
+            </div>
+          </div>
+
         </div>
       </form>
     </div>
@@ -602,19 +647,100 @@ const loadingStyle = {
 
 const formLayoutStyle = {
   display: "grid",
+  gridTemplateColumns: "minmax(0, 1fr) 310px",
+  gap: 18,
+  alignItems: "start",
+};
+
+const mainColStyle = {
+  display: "flex",
+  flexDirection: "column",
   gap: 14,
 };
 
-const responsiveGridStyle = adminResponsiveGridStyle;
+const sidebarColStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 14,
+};
 
-const threeColGridStyle = {
+const twoColStyle = {
   display: "grid",
-  gridTemplateColumns: "1fr 180px 180px",
+  gridTemplateColumns: "1fr 1fr",
   gap: 12,
   alignItems: "start",
 };
 
-const imageGridStyle = adminImageGridStyle;
+const imageGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 10,
+};
+
+const requiredStarStyle = {
+  color: "#EF4444",
+  marginLeft: 2,
+};
+
+const imgCountBadgeStyle = {
+  marginLeft: 8,
+  fontSize: 11,
+  fontWeight: 600,
+  color: "#94A3B8",
+};
+
+const catAccordionStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 4,
+  maxHeight: 320,
+  overflowY: "auto",
+  padding: "2px 0",
+};
+
+const catDropdownItemStyle = (active) => ({
+  borderRadius: 8,
+  border: active ? "1.5px solid #C7D0FF" : "1.5px solid #E8EDF6",
+  background: active ? "#F5F6FF" : "#FAFBFF",
+  overflow: "hidden",
+});
+
+const catDropdownHeaderStyle = (active) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "9px 12px",
+  cursor: "pointer",
+  userSelect: "none",
+});
+
+const catDropdownNameStyle = (active) => ({
+  fontSize: 13,
+  fontWeight: active ? 700 : 500,
+  color: active ? "#1a2460" : "#334155",
+});
+
+const catCheckmarkStyle = {
+  fontSize: 10,
+  color: "#2B3A8B",
+  fontWeight: 900,
+};
+
+const catChevronStyle = (open) => ({
+  fontSize: 9,
+  color: "#94A3B8",
+  transition: "transform 0.15s",
+  opacity: open ? 1 : 0.6,
+});
+
+const catSubPillsStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 5,
+  padding: "6px 12px 10px",
+  borderTop: "1px solid #EEF1FB",
+  background: "#fff",
+};
 
 const sectionStyle = adminSectionStyle;
 
@@ -714,40 +840,6 @@ const footerBarStyle = {
   flexWrap: "wrap",
 };
 
-const catPillsPanelStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 8,
-  padding: "10px 14px",
-  background: "#F8F9FD",
-  borderRadius: 10,
-  border: "1px solid #E0E4F0",
-};
-
-const catPillGroupStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  flexWrap: "wrap",
-};
-
-const catPillGroupLabelStyle = {
-  fontSize: 11,
-  fontWeight: 700,
-  color: "#6B7280",
-  textTransform: "uppercase",
-  letterSpacing: "0.04em",
-  whiteSpace: "nowrap",
-  minWidth: 160,
-  flexShrink: 0,
-};
-
-const catPillsRowStyle = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 6,
-};
-
 const catPillStyle = (checked) => ({
   fontSize: 12,
   fontWeight: checked ? 700 : 400,
@@ -771,10 +863,4 @@ const catSelectedBadgeStyle = {
   padding: "1px 8px",
   fontSize: 10,
   fontWeight: 700,
-};
-
-const descRowStyle = {
-  display: "flex",
-  gap: 14,
-  alignItems: "flex-start",
 };

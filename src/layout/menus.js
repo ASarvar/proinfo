@@ -7,7 +7,19 @@ import { useI18n } from '@i18n/i18n-context';
 
 const Menus = () => {
   const { t, locale } = useI18n();
-  const menu_data = useMemo(() => getMenuData(t, locale), [t, locale]);
+  const [dbCategories, setDbCategories] = useState([]);
+
+  useEffect(() => {
+    const lang = (locale || "ru").toUpperCase();
+    fetch(`/api/categories?lang=${lang}&limit=200`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (json?.success) setDbCategories(json.data || []);
+      })
+      .catch(() => {});
+  }, [locale]);
+
+  const menu_data = useMemo(() => getMenuData(t, locale, dbCategories), [t, locale, dbCategories]);
 
   const [activeMainCategoryKey, setActiveMainCategoryKey] = useState("");
   const [activeSubcategorySlug, setActiveSubcategorySlug] = useState("");
