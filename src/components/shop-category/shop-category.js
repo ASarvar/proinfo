@@ -4,39 +4,22 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Scrollbar } from "swiper/modules";
 // internal
 import SingleCategory from "./single-category";
-import { getCategoryGroups } from "@data/catalog-categories";
 import { useI18n } from "@i18n/i18n-context";
-
-const groupImageMap = {
-  rfid: "/assets/img/product/category/category-1.jpg",
-  automation: "/assets/img/product/category/category-2.jpg",
-  software: "/assets/img/product/category/category-3.jpg",
-  equipment: "/assets/img/product/category/category-4.jpg",
-  interactive: "/assets/img/product/category/category-5.jpg",
-  infrastructure: "/assets/img/product/category/category-1.jpg",
-  innovation: "/assets/img/product/category/category-2.jpg",
-};
 
 const ShopCategoryArea = () => {
   const { locale, t } = useI18n();
   const scrollbarRef = useRef(null);
   const localizedSolutions = t("solutions.categories");
-  const hasLocalizedSolutions = Array.isArray(localizedSolutions);
 
-  const solutions_data = getCategoryGroups().map((group, index) => ({
-    id: index + 1,
-    parent: hasLocalizedSolutions
-      ? localizedSolutions[index]?.name || group.name
-      : group.name,
-    description: hasLocalizedSolutions
-      ? localizedSolutions[index]?.description
-      : undefined,
-    img:
-      groupImageMap[group.key] || "/assets/img/product/category/category-1.jpg",
-    link: group.categories[0]
-      ? `/${locale}/category/${group.categories[0].slug}/products`
-      : `/${locale}/category`,
-  }));
+  const solutions_data = Array.isArray(localizedSolutions)
+    ? localizedSolutions.map((sol, index) => ({
+        id: sol.slug || index,
+        parent: sol.name,
+        description: sol.description,
+        img: `/assets/img/solutions/${sol.slug}.jpg`,
+        link: `/${locale}/solutions/${sol.slug}`,
+      }))
+    : [];
 
   return (
     <section className="product__category pt-100 pb-100">

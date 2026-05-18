@@ -88,7 +88,7 @@
             background-color: var(--tp-common-white);
             box-shadow: 0px 1px 2px rgba(3, 4, 28, 0.1);
             color: var(--tp-common-black);
-            padding: 9px 25px;
+            padding: 40px 125px;
 
             &:hover{
                 background-color: var(--tp-theme-1);
@@ -103,13 +103,16 @@
 }
 
 .hero-solid {
+    min-height: 80vh;
+    background: #03041C;
+
     & .hero-solid-swiper {
         width: 100%;
     }
 
     & .hero-solid-slide {
-        min-height: clamp(520px, 72vh, 760px);
-        background-image: linear-gradient(100deg, rgba(3, 4, 28, 0.98) 0%, rgba(3, 4, 28, 0.68) 55%, rgba(3, 4, 28, 0.1) 100%), url('/assets/img/banner/hero-1.jpg');
+        min-height: 80vh;
+        background-image: linear-gradient(100deg, rgba(3,4,28,0.92) 0%, rgba(3,4,28,0.65) 55%, rgba(3,4,28,0.12) 100%), var(--slide-bg);
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -135,20 +138,11 @@
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--tp-common-white);
-
-                &:after {
-                    height: 20px;
-                }
-        }
-
-        & .slider__title-pre-13[data-aos] {
             opacity: 0;
-            @include transform(translateY(-12px));
-        }
 
-        & .slider__title-pre-13[data-aos].aos-animate {
-            opacity: 0.88;
-            @include transform(translateY(0));
+            &:after {
+                height: 20px;
+            }
         }
 
         & .slider__title-13 {
@@ -156,26 +150,59 @@
             line-height: 1.08;
             font-size: clamp(2rem, 4.5vw, 4.4rem);
             margin-bottom: 16px;
+            opacity: 0;
         }
 
         & .hero-solid-description {
             font-size: clamp(1rem, 1.5vw, 1.2rem);
             line-height: 1.6;
             color: var(--tp-common-white);
-            margin-bottom: 30px;
+            margin-bottom: 60px;
             max-width: 620px;
+            opacity: 0;
         }
 
-        & .hero-solid-description[data-aos] {
-            opacity: 0 !important;
-            @include transform(translateY(14px));
+        & .hero-solid-actions {
+            opacity: 0;
+        }
+    }
+
+    // Hide non-active slides completely
+    & .swiper-slide:not(.swiper-slide-active) {
+        opacity: 0 !important;
+        pointer-events: none;
+    }
+
+    // Animate content only in the active slide
+    & .swiper-slide-active {
+        & .slider__title-pre-13 {
+            animation: heroFadeDown 0.7s ease forwards 0.05s;
         }
 
-        & .hero-solid-description[data-aos].aos-animate {
-            opacity: 0.9 !important;
-            @include transform(translateY(0));
+        & .slider__title-13 {
+            animation: heroFadeUp 0.75s ease forwards 0.18s;
         }
 
+        & .hero-solid-description {
+            animation: heroFadeUp 0.75s ease forwards 0.32s;
+        }
+
+        & .hero-solid-actions {
+            animation: heroFadeUp 0.75s ease forwards 0.46s;
+        }
+    }
+
+    @keyframes heroFadeUp {
+        from { opacity: 0; transform: translateY(22px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes heroFadeDown {
+        from { opacity: 0; transform: translateY(-14px); }
+        to   { opacity: 0.88; transform: translateY(0); }
+    }
+
+    & .hero-solid-content {
         & .tp-btn-border {
             border-color: var(--tp-common-white);
             color: var(--tp-common-white);
@@ -200,7 +227,7 @@
 
     @media #{$xs} {
         & .hero-solid-slide {
-            min-height: 520px;
+            min-height: 90vh;
         }
 
         & .hero-solid-content {

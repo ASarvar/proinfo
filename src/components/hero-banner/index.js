@@ -8,14 +8,33 @@ import AOS from "aos";
 import { RightArrow } from "@svg/index";
 import { useI18n } from "@i18n/i18n-context";
 
-const slider_data = [1, 2, 3];
+const slider_data = [
+  {
+    id: 1,
+    image: "/assets/img/banner/hero-1.jpg",
+    btn1Href: "/products",
+    btn2Href: "/contact",
+  },
+  {
+    id: 2,
+    image: "/assets/img/banner/hero-2.jpg",
+    btn1Href: "/contact",
+    btn2Href: "/contact",
+  },
+  {
+    id: 3,
+    image: "/assets/img/banner/hero-3.jpg",
+    btn1Href: "/products",
+    btn2Href: "/about",
+  },
+];
 
 const HeroBanner = () => {
-  const [loop, setLoop] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { t, locale } = useI18n();
 
   useEffect(() => {
-    setLoop(true);
+    setMounted(true);
     AOS.init({
       duration: 900,
       easing: "ease-out-cubic",
@@ -29,6 +48,10 @@ const HeroBanner = () => {
     });
   }, []);
 
+  if (!mounted) {
+    return <section className="slider__area hero-solid" />;
+  }
+
   return (
     <section className="slider__area hero-solid">
       <Swiper
@@ -36,7 +59,7 @@ const HeroBanner = () => {
         slidesPerView={1}
         spaceBetween={0}
         effect="fade"
-        loop={loop}
+        loop={true}
         modules={[EffectFade, Autoplay]}
         speed={900}
         autoplay={{
@@ -44,40 +67,37 @@ const HeroBanner = () => {
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
-        onSlideChangeTransitionEnd={() => AOS.refreshHard()}
+        onSlideChangeTransitionEnd={() => {}}
       >
-        {slider_data.map((id) => (
+        {slider_data.map(({ id, image, btn1Href, btn2Href }) => (
           <SwiperSlide
             key={id}
             className="slider__item-13 slider__height-13 d-flex align-items-center hero-solid-slide"
+            style={{ "--slide-bg": `url('${image}')` }}
           >
             <div className="container">
               <div className="row">
                 <div className="col-xxl-7 col-xl-8 col-lg-9">
                   <div className="slider__content-13 hero-solid-content">
-                    <span className="slider__title-pre-13 pb-20" data-aos="fade-down" data-aos-delay="50">
+                    <span className="slider__title-pre-13 pb-20">
                       {t(`hero.slide${id}.preTitle`)}
                     </span>
-                    <h3 className="slider__title-13" data-aos="fade-up" data-aos-delay="130">
+                    <h3 className="slider__title-13">
                       {t(`hero.slide${id}.title`)}
                     </h3>
-                    <p
-                      className="hero-solid-description"
-                      data-aos="slide-up"
-                      data-aos-delay="210"
-                    >
+                    <p className="hero-solid-description pt-20">
                       {t(`hero.slide${id}.description`)}
                     </p>
 
-                    <div className="slider__btn-13 hero-solid-actions" data-aos="fade-up" data-aos-delay="290">
-                      <Link href={`/${locale}/products`} className="tp-btn-2">
-                        {t("hero.actions.solutions")}
+                    <div className="slider__btn-13 hero-solid-actions pt-20">
+                      <Link href={`/${locale}${btn1Href}`} className="tp-btn-2">
+                        {t(`hero.slide${id}.btn1`)}
                         <span className="pl-10">
                           <RightArrow />
                         </span>
                       </Link>
-                      <Link href={`/${locale}/contact`} className="tp-btn-border">
-                        {t("hero.actions.contact")}
+                      <Link href={`/${locale}${btn2Href}`} className="tp-btn-border">
+                        {t(`hero.slide${id}.btn2`)}
                       </Link>
                     </div>
                   </div>

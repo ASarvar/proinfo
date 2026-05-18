@@ -3,7 +3,7 @@ import { prisma, getEntityTranslations, formatResponse, formatError, Language } 
 import { requireAdmin } from "../../../../lib/api-auth";
 
 /**
- * GET /api/directions/[slug]
+ * GET /api/solutions/[slug]
  */
 export async function GET(
   request: NextRequest,
@@ -16,7 +16,7 @@ export async function GET(
     const direction = await prisma.direction.findUnique({ where: { slug } });
 
     if (!direction) {
-      return NextResponse.json(formatError({ message: "Direction not found" }), { status: 404 });
+      return NextResponse.json(formatError({ message: "Solution not found" }), { status: 404 });
     }
 
     const translations = await getEntityTranslations("Direction", direction.id, [lang]);
@@ -31,13 +31,13 @@ export async function GET(
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("[GET /api/directions/[slug]]", error);
+    console.error("[GET /api/solutions/[slug]]", error);
     return NextResponse.json(formatError(error), { status: 500 });
   }
 }
 
 /**
- * DELETE /api/directions/[slug]
+ * DELETE /api/solutions/[slug]
  */
 export async function DELETE(
   request: NextRequest,
@@ -53,14 +53,14 @@ export async function DELETE(
 
     const direction = await prisma.direction.findUnique({ where: { slug } });
     if (!direction) {
-      return NextResponse.json(formatError({ message: "Direction not found" }), { status: 404 });
+      return NextResponse.json(formatError({ message: "Solution not found" }), { status: 404 });
     }
 
     await prisma.direction.delete({ where: { slug } });
 
-    return NextResponse.json(formatResponse(null, "Direction deleted"), { status: 200 });
+    return NextResponse.json(formatResponse(null, "Solution deleted"), { status: 200 });
   } catch (error: any) {
-    console.error("[DELETE /api/directions/[slug]]", error);
+    console.error("[DELETE /api/solutions/[slug]]", error);
     return NextResponse.json(formatError(error), { status: 500 });
   }
 }

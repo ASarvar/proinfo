@@ -52,8 +52,8 @@ const getMenuData = (t, locale, categories = []) => [
   },
   {
     id: 2,
-    title: t("nav.directions"),
-    link: `/${locale}/directions`,
+    title: t("nav.solutions"),
+    link: `/${locale}/solutions`,
   },
   {
     id: 3,

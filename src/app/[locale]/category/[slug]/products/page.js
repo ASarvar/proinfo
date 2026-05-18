@@ -1,46 +1,56 @@
 import { notFound } from "next/navigation";
 import ShopMainArea from "@components/shop/shop-main-area";
-import {
-  categoryGroups,
-  getTopLevelCategories,
-  getCategoryBySlug,
-} from "@data/catalog-categories";
+import { getPublicCategories, getPublicProducts } from "@lib/admin-content";
+import { Language } from "@prisma/client";
+
+const localeToLang = (locale = "ru") => {
+  if (locale === "uz") return Language.UZ;
+  if (locale === "en") return Language.EN;
+  return Language.RU;
+};
 
 export async function generateStaticParams() {
-  return getTopLevelCategories().map((category) => ({ slug: category.slug }));
+  try {
+    const categories = await getPublicCategories();
+    return categories.map((c) => ({ slug: c.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
-
-  if (!category) {
-    return {
-      title: "Категория не найдена - ProInfo.uz",
-    };
-  }
-
-  return {
-    title: `${category.name} - Товары категории - ProInfo.uz`,
-  };
+  try {
+    const categories = await getPublicCategories();
+    const category = categories.find((c) => c.slug === slug);
+    if (category) {
+      return { title: `${category.title} - Товары категории - ProInfo.uz` };
+    }
+  } catch {}
+  return { title: "Категория не найдена - ProInfo.uz" };
 }
 
 export default async function CategorySlugProductsPage({ params }) {
   const { locale, slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const lang = localeToLang(locale);
 
+  const [categories, products] = await Promise.all([
+    getPublicCategories(lang),
+    getPublicProducts(lang),
+  ]);
+
+  const category = categories.find((c) => c.slug === slug);
   if (!category) {
     notFound();
   }
-
-  const group = categoryGroups.find((item) => item.key === category.groupKey);
 
   return (
     <ShopMainArea
       Category={slug}
       locale={locale}
-      groupName={group?.name}
-      categoryName={category.name}
+      categoryName={category.title}
+      initialProducts={products}
+      initialCategories={categories}
     />
   );
 }

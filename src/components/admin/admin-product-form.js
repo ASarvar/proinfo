@@ -493,27 +493,48 @@ export default function AdminProductForm({ mode = "create", productId }) {
 
           {/* Product Category */}
           <div style={sectionStyle}>
-            <div style={sectionTitleStyle}>
-              Product Category
-              {form.categorySlugs.length > 0 && (
-                <span style={catSelectedBadgeStyle}>{form.categorySlugs.length} selected</span>
-              )}
-            </div>
+            <div style={sectionTitleStyle}>Product Category</div>
+
+            {/* Selected chips */}
+            {form.categorySlugs.length > 0 && (
+              <div style={catChipsWrapStyle}>
+                {form.categorySlugs.map((slug) => {
+                  const title = dbCategories.find((c) => c.slug === slug)?.title || slug;
+                  return (
+                    <span key={slug} style={catChipStyle}>
+                      {title}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            categorySlugs: prev.categorySlugs.filter((s) => s !== slug),
+                          }))
+                        }
+                        style={catChipRemoveStyle}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Accordion list */}
             <div style={catAccordionStyle}>
               {groupedCats.map((group) => {
                 const isOpen = expandedGroup === group.key;
                 const groupChecked = group.cats.some((c) => form.categorySlugs.includes(c.slug));
                 const hasSubs = group.cats.length > 1 || (group.cats.length === 1 && group.cats[0].slug !== group.key);
                 return (
-                  <div key={group.key} style={catDropdownItemStyle(groupChecked)}>
-                    {/* Header row — clicking selects top-level OR toggles subs */}
+                  <div key={group.key}>
                     <div
-                      style={catDropdownHeaderStyle(groupChecked)}
+                      style={catGroupHeaderStyle(isOpen)}
                       onClick={() => {
                         if (hasSubs) {
                           setExpandedGroup(isOpen ? null : group.key);
                         } else {
-                          // no subs — directly toggle this cat
                           const slug = group.cats[0]?.slug;
                           if (!slug) return;
                           setForm((prev) => ({
@@ -525,23 +546,27 @@ export default function AdminProductForm({ mode = "create", productId }) {
                         }
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        {groupChecked && <span style={catCheckmarkStyle}>✓</span>}
-                        <span style={catDropdownNameStyle(groupChecked)}>{group.name}</span>
-                      </div>
+                      <span style={catGroupNameStyle(isOpen || groupChecked)}>{group.name}</span>
                       {hasSubs && (
-                        <span style={catChevronStyle(isOpen)}>{isOpen ? "▲" : "▼"}</span>
+                        <span style={{
+                          fontSize: 11,
+                          color: "#64748B",
+                          display: "inline-block",
+                          transform: isOpen ? "rotate(0deg)" : "rotate(180deg)",
+                          transition: "transform 0.18s",
+                          lineHeight: 1,
+                          userSelect: "none",
+                        }}>&#8743;</span>
                       )}
                     </div>
-                    {/* Subcategory pills — shown when expanded */}
                     {hasSubs && isOpen && (
-                      <div style={catSubPillsStyle}>
+                      <div style={catSubListStyle}>
                         {group.cats.map((cat) => {
                           const checked = form.categorySlugs.includes(cat.slug);
                           return (
-                            <button
+                            <div
                               key={cat.slug}
-                              type="button"
+                              style={catSubItemStyle(checked)}
                               onClick={() =>
                                 setForm((prev) => ({
                                   ...prev,
@@ -550,11 +575,9 @@ export default function AdminProductForm({ mode = "create", productId }) {
                                     : [...prev.categorySlugs, cat.slug],
                                 }))
                               }
-                              style={catPillStyle(checked)}
                             >
-                              {checked && <span style={{ marginRight: 4, fontSize: 10 }}>✓</span>}
                               {cat.title}
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -563,6 +586,7 @@ export default function AdminProductForm({ mode = "create", productId }) {
                 );
               })}
             </div>
+
             {form.categorySlugs.length === 0 && (
               <span style={{ color: "#ef4444", fontSize: 11, marginTop: 4, display: "block" }}>
                 Select at least one category
@@ -689,58 +713,80 @@ const imgCountBadgeStyle = {
   color: "#94A3B8",
 };
 
-const catAccordionStyle = {
+const catChipsWrapStyle = {
   display: "flex",
-  flexDirection: "column",
-  gap: 4,
-  maxHeight: 320,
-  overflowY: "auto",
-  padding: "2px 0",
+  flexWrap: "wrap",
+  gap: 6,
+  marginBottom: 8,
 };
 
-const catDropdownItemStyle = (active) => ({
-  borderRadius: 8,
-  border: active ? "1.5px solid #C7D0FF" : "1.5px solid #E8EDF6",
-  background: active ? "#F5F6FF" : "#FAFBFF",
-  overflow: "hidden",
-});
+const catChipStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 5,
+  background: "#F1F5F9",
+  border: "1px solid #CBD5E1",
+  borderRadius: 6,
+  padding: "4px 10px",
+  fontSize: 12,
+  fontWeight: 500,
+  color: "#334155",
+};
 
-const catDropdownHeaderStyle = (active) => ({
+const catChipRemoveStyle = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  color: "#94A3B8",
+  fontSize: 15,
+  lineHeight: 1,
+  padding: 0,
+  fontWeight: 700,
+  marginLeft: 2,
+};
+
+const catAccordionStyle = {
+  border: "1px solid #E2E8F0",
+  borderRadius: 10,
+  overflow: "hidden",
+  maxHeight: 320,
+  overflowY: "auto",
+  background: "#fff",
+};
+
+const catGroupHeaderStyle = (isOpen) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  padding: "9px 12px",
+  padding: "10px 14px",
   cursor: "pointer",
   userSelect: "none",
+  background: isOpen ? "#F8FAFC" : "#fff",
+  borderBottom: "1px solid #F1F5F9",
 });
 
-const catDropdownNameStyle = (active) => ({
+const catGroupNameStyle = (active) => ({
   fontSize: 13,
-  fontWeight: active ? 700 : 500,
-  color: active ? "#1a2460" : "#334155",
+  fontWeight: active ? 700 : 400,
+  color: "#1E293B",
+  lineHeight: 1.3,
 });
 
-const catCheckmarkStyle = {
-  fontSize: 10,
-  color: "#2B3A8B",
-  fontWeight: 900,
+const catSubListStyle = {
+  background: "#FAFBFD",
+  borderBottom: "1px solid #F1F5F9",
+  paddingTop: 2,
+  paddingBottom: 6,
 };
 
-const catChevronStyle = (open) => ({
-  fontSize: 9,
-  color: "#94A3B8",
-  transition: "transform 0.15s",
-  opacity: open ? 1 : 0.6,
+const catSubItemStyle = (checked) => ({
+  padding: "7px 14px 7px 28px",
+  fontSize: 13,
+  color: checked ? "#1a2460" : "#475569",
+  fontWeight: checked ? 600 : 400,
+  cursor: "pointer",
+  background: checked ? "#EEF2FF" : "transparent",
 });
-
-const catSubPillsStyle = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 5,
-  padding: "6px 12px 10px",
-  borderTop: "1px solid #EEF1FB",
-  background: "#fff",
-};
 
 const sectionStyle = adminSectionStyle;
 
@@ -838,29 +884,4 @@ const footerBarStyle = {
   justifyContent: "flex-end",
   marginTop: 4,
   flexWrap: "wrap",
-};
-
-const catPillStyle = (checked) => ({
-  fontSize: 12,
-  fontWeight: checked ? 700 : 400,
-  padding: "4px 12px",
-  borderRadius: 999,
-  border: checked ? "1.5px solid #2B3A8B" : "1.5px solid #D0D5E8",
-  background: checked ? "#EEF0FF" : "#fff",
-  color: checked ? "#1a2460" : "#4B5563",
-  cursor: "pointer",
-  transition: "all 0.12s",
-  display: "flex",
-  alignItems: "center",
-  gap: 4,
-});
-
-const catSelectedBadgeStyle = {
-  marginLeft: 8,
-  background: "#2B3A8B",
-  color: "#fff",
-  borderRadius: 999,
-  padding: "1px 8px",
-  fontSize: 10,
-  fontWeight: 700,
 };

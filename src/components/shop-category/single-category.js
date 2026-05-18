@@ -6,7 +6,7 @@ const SingleCategory = ({ item }) => {
   const categoryLink = item.link || "/category";
 
   return (
-    <div className="product__category-item mb-20 text-center">
+    <div className="product__category-item mb-20 ">
       <div className="product__category-thumb w-img">
         <Link href={categoryLink}>
           <Image
@@ -25,7 +25,7 @@ const SingleCategory = ({ item }) => {
           </Link>
         </h3>
         {item.description && (
-          <p className="product__category-description">
+          <p className="product__category-description pt-20">
             {item.description}
           </p>
         )}

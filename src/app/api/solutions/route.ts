@@ -4,8 +4,8 @@ import { requireAdmin } from "../../../lib/api-auth";
 import { normalizeSlug, normalizeText, isValidSlug } from "../../../lib/validation";
 
 /**
- * GET /api/directions
- * Get all directions
+ * GET /api/solutions
+ * Get all solutions
  */
 export async function GET(request: NextRequest) {
   try {
@@ -32,16 +32,16 @@ export async function GET(request: NextRequest) {
       })
     );
 
-    return NextResponse.json(formatResponse(enriched, `Retrieved ${directions.length} directions`), { status: 200 });
+    return NextResponse.json(formatResponse(enriched, `Retrieved ${directions.length} solutions`), { status: 200 });
   } catch (error: any) {
-    console.error("[GET /api/directions]", error);
+    console.error("[GET /api/solutions]", error);
     return NextResponse.json(formatError(error), { status: 500 });
   }
 }
 
 /**
- * POST /api/directions
- * Create a new direction
+ * POST /api/solutions
+ * Create a new solution
  */
 export async function POST(request: NextRequest) {
   try {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     const existing = await prisma.direction.findUnique({ where: { slug } });
     if (existing) {
-      return NextResponse.json(formatError({ message: "Direction with this slug already exists" }), { status: 409 });
+      return NextResponse.json(formatError({ message: "Solution with this slug already exists" }), { status: 409 });
     }
 
     const direction = await prisma.direction.create({
@@ -86,11 +86,11 @@ export async function POST(request: NextRequest) {
     await createEntityTranslations("Direction", direction.id, translationsData);
 
     return NextResponse.json(
-      formatResponse({ id: direction.id, slug: direction.slug }, "Direction created"),
+      formatResponse({ id: direction.id, slug: direction.slug }, "Solution created"),
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("[POST /api/directions]", error);
+    console.error("[POST /api/solutions]", error);
     return NextResponse.json(formatError(error), { status: 500 });
   }
 }

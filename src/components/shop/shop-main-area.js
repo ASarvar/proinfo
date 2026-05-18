@@ -2,32 +2,22 @@
 // internal
 import Wrapper from "@layout/wrapper";
 import Header from "@layout/header";
-import ShopCta from "@components/cta";
 import Footer from "@layout/footer";
 import ShopBreadcrumb from "@components/common/breadcrumb/shop-breadcrumb";
 import ShopArea from "@components/shop/shop-area";
 import {
-  getCategoryBySlug,
-  productsWithResolvedCategories,
-  getNormalizedProductCategorySlug,
+  getCategoryBySlug as getStaticCategoryBySlug,
 } from "@data/catalog-categories";
 
-const belongsToCategory = (product, selectedSlug) => {
-  if (!selectedSlug) {
-    return true;
-  }
+const makeBelongsToCategory = (categoriesMap) => (product, selectedSlug) => {
+  if (!selectedSlug) return true;
 
-  let currentSlug = getNormalizedProductCategorySlug(product);
-
+  let currentSlug = (product?.categorySlug || "").trim();
   while (currentSlug) {
-    if (currentSlug === selectedSlug) {
-      return true;
-    }
-
-    const currentCategory = getCategoryBySlug(currentSlug);
-    currentSlug = currentCategory?.parentSlug;
+    if (currentSlug === selectedSlug) return true;
+    const cat = categoriesMap.get(currentSlug) || getStaticCategoryBySlug(currentSlug);
+    currentSlug = cat?.parentSlug || null;
   }
-
   return false;
 };
 
@@ -42,9 +32,13 @@ export default function ShopMainArea({
   locale,
   groupName,
   categoryName,
+  initialProducts = [],
+  initialCategories = [],
 }) {
-  // Use mock data instead of API
-  const products = productsWithResolvedCategories;
+  const categoriesMap = new Map(initialCategories.map((c) => [c.slug, c]));
+  const belongsToCategory = makeBelongsToCategory(categoriesMap);
+
+  const products = initialProducts;
   let all_products = products;
   let product_items = all_products;
 
@@ -85,3 +79,4 @@ export default function ShopMainArea({
     </Wrapper>
   );
 }
+

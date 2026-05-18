@@ -201,6 +201,116 @@ export async function listAdminContent(resource: AdminResource, lang: Language =
   );
 }
 
+// ── Public-facing product/category fetchers ─────────────────────────────────
+
+export async function getPublicProducts(lang: Language = Language.RU) {
+  const rows = await prisma.product.findMany({
+    orderBy: { order: "asc" },
+    take: 500,
+    include: { category: { select: { slug: true } } },
+  });
+
+  return Promise.all(
+    rows.map(async (row) => {
+      const tr = await getEntityTranslations("Product", row.id, [lang]);
+      const rawTr = tr[lang] || {};
+      let extras: Record<string, unknown> = {};
+      try {
+        if (rawTr.content) extras = JSON.parse(rawTr.content as string);
+      } catch {}
+      return {
+        _id: row.slug,
+        id: row.id,
+        slug: row.slug,
+        categorySlug: row.category.slug,
+        image: row.imageUrl || "/assets/img/product/placeholder.jpg",
+        imageUrl: row.imageUrl,
+        price: row.price,
+        title: rawTr.title || row.slug,
+        description: rawTr.description,
+        ...extras,
+      };
+    })
+  );
+}
+
+export async function getPublicDirections(lang: Language = Language.RU) {
+  const rows = await prisma.direction.findMany({
+    orderBy: { order: "asc" },
+    take: 20,
+  });
+
+  return Promise.all(
+    rows.map(async (row) => {
+      const tr = await getEntityTranslations("Direction", row.id, [lang]);
+      const rawTr = tr[lang] || {};
+      let extras: Record<string, unknown> = {};
+      try {
+        if (rawTr.content) extras = JSON.parse(rawTr.content as string);
+      } catch {}
+      return {
+        id: row.id,
+        slug: row.slug,
+        imageUrl: row.imageUrl || null,
+        title: rawTr.title || row.slug,
+        description: rawTr.description || null,
+        ...extras,
+      };
+    })
+  );
+}
+
+export async function getPublicDirectionBySlug(slug: string, lang: Language = Language.RU) {
+  const row = await prisma.direction.findUnique({ where: { slug } });
+  if (!row) return null;
+
+  const tr = await getEntityTranslations("Direction", row.id, [lang]);
+  const rawTr = tr[lang] || {};
+  let extras: Record<string, unknown> = {};
+  try {
+    if (rawTr.content) extras = JSON.parse(rawTr.content as string);
+  } catch {}
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    imageUrl: row.imageUrl || null,
+    title: rawTr.title || row.slug,
+    description: rawTr.description || null,
+    content: rawTr.content || null,
+    ...extras,
+  };
+}
+
+export async function getPublicCategories(lang: Language = Language.RU) {
+  const rows = await prisma.category.findMany({
+    orderBy: { order: "asc" },
+    take: 200,
+  });
+
+  return Promise.all(
+    rows.map(async (row) => {
+      const tr = await getEntityTranslations("Category", row.id, [lang]);
+      const catTr = tr[lang] || {};
+      let parentSlug: string | null = null;
+      try {
+        if (catTr.content) {
+          const extras = JSON.parse(catTr.content as string);
+          parentSlug = extras?.parentSlug || null;
+        }
+      } catch {}
+      return {
+        id: row.id,
+        slug: row.slug,
+        title: catTr.title || row.slug,
+        description: catTr.description,
+        parentSlug,
+        imageUrl: row.imageUrl,
+      };
+    })
+  );
+}
+
 export async function getAdminContentById(resource: AdminResource, id: string, lang: Language = Language.RU) {
   if (resource === "products") {
     const row = await prisma.product.findUnique({ where: { id }, include: { category: true } });
@@ -506,4 +616,50 @@ export async function deleteAdminContent(resource: AdminResource, id: string) {
   if (resource === "photo") return prisma.photoAlbum.delete({ where: { id } });
   if (resource === "download") return prisma.downloadFile.delete({ where: { id } });
   return prisma.faq.delete({ where: { id } });
+}
+
+// ── Direction related-product helpers ────────────────────────────────────────
+
+/** Returns the admin-pinned product slugs for a direction (language-agnostic, stored in RU translation). */
+export async function getDirectionRelatedProductSlugs(slug: string): Promise<string[]> {
+  const dir = await prisma.direction.findUnique({ where: { slug } });
+  if (!dir) return [];
+  const tr = await prisma.translation.findFirst({
+    where: { directionId: dir.id, language: Language.RU },
+  });
+  if (!tr?.content) return [];
+  try {
+    const parsed = JSON.parse(tr.content);
+    return Array.isArray(parsed.relatedProductSlugs) ? parsed.relatedProductSlugs : [];
+  } catch { return []; }
+}
+
+/** Saves the admin-selected product slugs for a direction. */
+export async function setDirectionRelatedProductSlugs(slug: string, productSlugs: string[]): Promise<void> {
+  const dir = await prisma.direction.findUnique({ where: { slug } });
+  if (!dir) throw new Error("Direction not found: " + slug);
+
+  const existing = await prisma.translation.findFirst({
+    where: { directionId: dir.id, language: Language.RU },
+  });
+
+  const newContent = JSON.stringify({ relatedProductSlugs: productSlugs });
+
+  if (existing) {
+    await prisma.translation.update({
+      where: { id: existing.id },
+      data: { content: newContent },
+    });
+  } else {
+    await prisma.translation.create({
+      data: {
+        language: Language.RU,
+        entityType: "Direction",
+        entityId: dir.id,
+        directionId: dir.id,
+        title: slug,
+        content: newContent,
+      },
+    });
+  }
 }

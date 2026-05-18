@@ -52,7 +52,11 @@ export default function AdminCategoriesPage() {
     setMessage("");
     setError("");
     if (subCount > 0) {
-      setBlockedTarget({ slug, subCount });
+      setBlockedTarget({ slug, subCount, productCount: 0 });
+      return;
+    }
+    if (productCount > 0) {
+      setBlockedTarget({ slug, subCount: 0, productCount });
       return;
     }
     setConfirmTarget({ id, slug, productCount });
@@ -66,36 +70,6 @@ export default function AdminCategoriesPage() {
     setDeleting(true);
     setError("");
     try {
-      if (productCount > 0) {
-        // Fetch all products whose primary category is this slug
-        const res = await fetch(`/api/products?category=${encodeURIComponent(slug)}&limit=1000`);
-        const json = await res.json();
-        const products = json?.data || [];
-
-        await Promise.all(
-          products.map(async (p) => {
-            // Parse categorySlugs stored in extras (may include primary slug too)
-            let categorySlugs = Array.isArray(p.categorySlugs) ? p.categorySlugs : [p.categorySlug].filter(Boolean);
-            const remaining = categorySlugs.filter((s) => s !== slug);
-
-            if (remaining.length === 0) {
-              // Only belonged to this category — delete the product entirely
-              await fetch(`/api/admin/products/${p.id}`, { method: "DELETE" });
-            } else {
-              // Belongs to other categories too — unlink: update primary + categorySlugs
-              await fetch(`/api/admin/products/${p.id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  categorySlug: remaining[0],
-                  categorySlugs: remaining,
-                }),
-              });
-            }
-          })
-        );
-      }
-
       // Delete the category itself
       const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
       const json = await res.json();
@@ -247,8 +221,12 @@ export default function AdminCategoriesPage() {
               Cannot Delete &ldquo;{blockedTarget.slug}&rdquo;
             </p>
             <p style={{ margin: "0 0 18px", color: "#fca5a5", fontSize: 13 }}>
-              This category has <strong>{blockedTarget.subCount}</strong> subcategor{blockedTarget.subCount === 1 ? "y" : "ies"}.<br />
-              Please delete all subcategories first before removing the parent.
+              {blockedTarget.subCount > 0 && (
+                <>This category has <strong>{blockedTarget.subCount}</strong> subcategor{blockedTarget.subCount === 1 ? "y" : "ies"}.<br />Please delete all subcategories first before removing the parent.</>
+              )}
+              {blockedTarget.productCount > 0 && (
+                <>This category has <strong>{blockedTarget.productCount}</strong> product{blockedTarget.productCount === 1 ? "" : "s"}.<br />Please reassign or delete all products before removing this category.</>
+              )}
             </p>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button
@@ -270,18 +248,9 @@ export default function AdminCategoriesPage() {
             <p style={{ margin: "0 0 6px", color: "#f8fafc", fontWeight: 700, fontSize: 16 }}>
               Delete &ldquo;{confirmTarget.slug}&rdquo;?
             </p>
-            {confirmTarget.productCount > 0 && (
-              <p style={{ margin: "0 0 18px", color: "#fca5a5", fontSize: 13 }}>
-                This category has <strong>{confirmTarget.productCount}</strong> product(s).<br />
-                Products that belong to other categories will be <strong>unlinked</strong> from this one.<br />
-                Products that <em>only</em> belong to this category will be <strong>permanently deleted</strong>.
-              </p>
-            )}
-            {confirmTarget.productCount === 0 && (
-              <p style={{ margin: "0 0 18px", color: "#94a3b8", fontSize: 13 }}>
-                This action is irreversible.
-              </p>
-            )}
+            <p style={{ margin: "0 0 18px", color: "#94a3b8", fontSize: 13 }}>
+              This action is irreversible.
+            </p>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button
                 type="button"
